@@ -1,6 +1,3 @@
-[![CI/CD](https://github.com/vertigis/workflow-activities-salesforce/workflows/CI/CD/badge.svg)](https://github.com/vertigis/workflow-activities-salesforce/actions)
-[![npm](https://img.shields.io/npm/v/@vertigis/workflow-activities-salesforce)](https://www.npmjs.com/package/@vertigis/workflow-activities-salesforce)
-
 This project contains activities for accessing an organizations data via the Salesforce REST API.  [Click here](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_rest.htm) for more information on the resources and requests avaialble via the Salesforce REST API 
 ## Requirements
 
