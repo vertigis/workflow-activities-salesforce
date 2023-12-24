@@ -1,5 +1,5 @@
-[![CI/CD](https://github.com/vertigis/workflow-activities-configurable-queries/workflows/CI/CD/badge.svg)](https://github.com/vertigis/workflow-activities-configurable-queries/actions)
-[![npm](https://img.shields.io/npm/v/@vertigis/workflow-activities-configurable-queries)](https://www.npmjs.com/package/@vertigis/workflow-activities-configurable-queries)
+[![CI/CD](https://github.com/vertigis/workflow-activities-salesforce/workflows/CI/CD/badge.svg)](https://github.com/vertigis/workflow-activities-salesforce/actions)
+[![npm](https://img.shields.io/npm/v/@vertigis/workflow-activities-salesforce)](https://www.npmjs.com/package/@vertigis/workflow-activities-salesforce)
 
 This project contains activities for accessing an organizations data via the Salesforce REST API.  [Click here](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_rest.htm) for more information on the resources and requests avaialble via the Salesforce REST API 
 ## Requirements
@@ -24,8 +24,8 @@ To use these activities in [VertiGIS Studio Workflow Designer](https://apps.vert
     - Purpose: `Ready To Use`
     - API: `JavaScript`
     - URL: The URL to this activity pack manifest
-        - Use https://unpkg.com/@vertigis/workflow-activities-configurable-queries/activitypack.json for the latest version
-        - Use https://unpkg.com/@vertigis/workflow-activities-configurable-queries@1.0.0/activitypack.json for a specific version
+        - Use https://unpkg.com/@vertigis/workflow-activities-salesforce/activitypack.json for the latest version
+        - Use https://unpkg.com/@vertigis/workflow-activities-salesforce@1.0.0/activitypack.json for a specific version
         - Use https://localhost:5000/activitypack.json for a local development version
     - Title: Your desired title
     - Tags: Must include `geocortex-workflow-activity-pack`
