@@ -4,7 +4,7 @@ This project contains activities for accessing an organization's data via the Sa
 ### Salesforce
 1. The target Salesforce instance must include the requesting origin in its Cross-Origin Resource Sharing (CORS) white list. [https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/extend_code_cors.htm]
 2. A connected app and an OAuth 2.0 authorization flow must be configured in Salesforce. [https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_oauth_and_connected_apps.htm].
-3. The provided [callback.html](../main/static/collback.html) page must be deployed to a CORS enabled web server.
+3. The provided [callback.html](../main/static/callback.html) page must be deployed to a CORS enabled web server.
 
 ### VertiGIS Studio Workflow Versions
 
