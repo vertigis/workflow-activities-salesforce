@@ -13,11 +13,6 @@ export interface OAuthSignInInputs {
     authorizeUrl: "https://login.salesforce.com/services/oauth2/authorize" | string;
 
     /**
-     * @required
-     */
-    responseType: "code" | "token" | string;
-
-    /**
      * @displayName Client ID
      * @description The Client ID of the OAuth app to sign in to.
      * @required
@@ -44,12 +39,8 @@ export interface OAuthSignInInputs {
 
 /** An interface that defines the outputs of the activity. */
 export interface OAuthSignInOutputs {
-    /**
-     * @description The result of the activity.
-     */
-    result: {
-        [key: string]: string;
-    }
+        token: string | undefined,
+        error: string | undefined,
 }
 
 /**
@@ -61,7 +52,7 @@ export interface OAuthSignInOutputs {
  */
 export default class OAuthSignIn implements IActivityHandler {
     async execute(inputs: OAuthSignInInputs): Promise<OAuthSignInOutputs> {
-        const { additionalParameters, audience, authorizeUrl, clientId, prompt, responseType, scope, state, timeout, redirectUri } = inputs;
+        const { additionalParameters, audience, authorizeUrl, clientId, prompt, scope, state, timeout, redirectUri } = inputs;
 
         // Validate inputs
         if (!authorizeUrl) {
@@ -70,9 +61,7 @@ export default class OAuthSignIn implements IActivityHandler {
         if (!clientId) {
             throw new Error("clientId is required");
         }
-        if (!responseType) {
-            throw new Error("responseType is required");
-        }
+
 
         // TODO: dynamically determine this
         console.log(thisScript);
@@ -84,7 +73,7 @@ export default class OAuthSignIn implements IActivityHandler {
             ...(audience ? { audience } : undefined),
             ...(prompt ? { prompt } : undefined),
             redirect_uri: redirectUri,
-            response_type: responseType,
+            response_type: "token",
             ...(scope ? { scope } : undefined),
             state: state != undefined ? state : generateRandomState(),
         })
@@ -118,26 +107,28 @@ export default class OAuthSignIn implements IActivityHandler {
                 console.log("message", e)
                 window.clearInterval(checkClosedHandle);
                 window.clearTimeout(timeoutHandle);
-                const result: Record<string, string> = {};
+                const result: OAuthSignInOutputs = { token: undefined, error: undefined };
 
                 if (e.data && typeof e.data === "string" && e.data.startsWith(redirectUri)) {
                     // Copy all querystring and hash parameters to the result
                     const parsedUrl = new URL(e.data);
                     for (const [key, value] of parsedUrl.searchParams.entries()) {
-                        result[key] = value;
+                        if (key === "access_token") {
+                            result[key] = value;
+                        }
                     }
                     const hashParams = new URLSearchParams(parsedUrl.hash.substring(1));
                     for (const [key, value] of hashParams.entries()) {
-                        result[key] = value;
+                        if (key === "access_token") {
+                            result[key] = value;
+                        }
                     }
                     window.clearInterval(checkClosedHandle);
                     window.removeEventListener("message", onMessage);
                     if (result.error) {
                         return reject(result);
                     } else {
-                        return resolve({
-                            result,
-                        });
+                        return resolve(result);
                     }
                 }
 

@@ -17,10 +17,11 @@ export interface SendSalesforceRequestInputs {
     method: "GET" | "POST" | "PATCH" | "DELETE";
 
     /**
-     * @description The Salesforce REST API object or operation to request.
+     * @description The Salesforce sObject REST API uri to request. This part of the sObject Basic Information attributes.
+     * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_sobject_basic_info.htm
      * @required
      */
-    path: string;
+    uri: string;
 
     /**
      * @description The query string parameters to send on the request.
@@ -56,6 +57,7 @@ export interface SendSalesforceRequestOutputs {
  * @category Salesforce
  * @defaultName sfRequest
  * @description Sends a request to the Salesforce REST API.
+ * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/using_resources_working_with_records.htm
  * @clientOnly
  * @supportedApps EXB, GWV, WAB
  */
@@ -63,36 +65,36 @@ export default class SendSalesforceRequest implements IActivityHandler {
     async execute(
         inputs: SendSalesforceRequestInputs
     ): Promise<SendSalesforceRequestOutputs> {
-        const { body, headers, method, path, query, service } = inputs;
+        const { body, headers, method, uri, query, service } = inputs;
         if (!service) {
             throw new Error("service is required");
         }
         if (!method) {
             throw new Error("method is required");
         }
-        if (!path) {
+        if (!uri) {
             throw new Error("path is required");
         }
 
         if (method == "GET") {
-            const response = await get(service, path, query, headers);
+            const response = await get(service, uri, query, headers);
             return {
                 result: response,
             };
         } else if (method == "POST") {
-            const response = await post(service, path, body, headers);
+            const response = await post(service, uri, body, headers);
             return {
                 result: response,
             };
         } else if (method == "PATCH") {
-            const response = await patch(service, path, body, headers);
+            const response = await patch(service, uri, body, headers);
             return {
                 result: response,
             };
         } else if (method == "DELETE") {
             const response = await httpDelete(
                 service,
-                path,
+                uri,
                 body,
                 headers
             );

@@ -11,10 +11,11 @@ interface GetSalesforceObjectMetadataInputs {
     salesforceService: SalesforceService;
 
     /**
-     * @description The name of the object. For example, Account.
+     * @description The name of the salesforce sObject. For example, Account.
+     * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_basic_info.htm
      * @required
      */
-    objectType: string;
+    sObject: string;
 }
 
 interface GetSalesforceObjectMetadataOutputs {
@@ -28,23 +29,24 @@ interface GetSalesforceObjectMetadataOutputs {
  * @category Salesforce
  * @defaultName sfMetadata
  * @description Gets basic metadata for a specified object, including some object properties, recent items, and URIs for other resources related to the object.
+ * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_basic_info_get.htm
  * @clientOnly
  * @supportedApps EXB, GWV, WAB
  */
 export default class GetSalesforceObjectMetadata implements IActivityHandler {
     async execute(inputs: GetSalesforceObjectMetadataInputs): Promise<GetSalesforceObjectMetadataOutputs> {
 
-        const { salesforceService, objectType} = inputs;
+        const { salesforceService, sObject} = inputs;
 
         if (!salesforceService) {
             throw new Error("salesforceService is required");
         }
 
-        if (!objectType) {
+        if (!sObject) {
             throw new Error("objectType is required");
         }
 
-        const path = `/services/data/v${salesforceService.version}/sobjects/${objectType}`;
+        const path = `/services/data/v${salesforceService.version}/sobjects/${sObject}`;
 
         const response = await get(salesforceService, path);
         return {

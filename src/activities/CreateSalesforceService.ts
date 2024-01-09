@@ -12,13 +12,14 @@ interface CreateSalesforceServiceInputs {
      * @description  The version of Salesforce to access.
      * @required
      */
-    version: string;
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    version: "59.0" | string;
 
     /**
      * @displayName URL
-     * @description The URL to the salesforce service.  This only needs to be provided when testing against a Salesforce sandbox.
+     * @description The full url to your organization's salesforce instance. (e.g. acme.my.salesforce.com)
      */
-    url?: string;
+    url: string;
 
 }
 
@@ -39,7 +40,7 @@ interface CreateSalesforceServiceOutputs {
  */
 export default class CreateSalesforceService implements IActivityHandler {
     execute(inputs: CreateSalesforceServiceInputs): CreateSalesforceServiceOutputs {
-        const {token, url = "https://login.salesforce.com/services", version} = inputs;
+        const {token, url, version} = inputs;
 
         if (!token) {
             throw new Error("token is required");
