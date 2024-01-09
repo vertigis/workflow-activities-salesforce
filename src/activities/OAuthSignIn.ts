@@ -114,13 +114,19 @@ export default class OAuthSignIn implements IActivityHandler {
                     const parsedUrl = new URL(e.data);
                     for (const [key, value] of parsedUrl.searchParams.entries()) {
                         if (key === "access_token") {
-                            result[key] = value;
+                            if (key === "access_token") {
+                                result.token = value;
+                            } else if(key === "error") {
+                                result.error = value;
+                            }
                         }
                     }
                     const hashParams = new URLSearchParams(parsedUrl.hash.substring(1));
                     for (const [key, value] of hashParams.entries()) {
                         if (key === "access_token") {
-                            result[key] = value;
+                            result.token = value;
+                        } else if(key === "error") {
+                            result.error = value;
                         }
                     }
                     window.clearInterval(checkClosedHandle);
