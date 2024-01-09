@@ -11,15 +11,16 @@ export async function get<T = any>(
     service: SalesforceService,
     path: string,
     query?: Record<string, string | number | boolean | null | undefined>,
-    headers?: Record<string, any>
-): Promise<T> {
+    headers?: Record<string, any>,
+    expectedResponse?: string
+): Promise<T | Blob> {
     if (!service.instanceUrl) {
         throw new Error("instanceUrl is required");
     }
     if (!service.accessToken) {
         throw new Error("accessToken is required");
     }
-    const qs = objectToQueryString({ lean: 1, ...query });
+    const qs = objectToQueryString({ ...query });
     const url = `${service.instanceUrl}/${path}${
         qs ? "?" + qs : ""
     }`;
@@ -32,8 +33,11 @@ export async function get<T = any>(
     });
 
     await checkResponse(response);
-
-    return await response.json();
+    if(expectedResponse === "blob") {
+        return await response.blob();
+    } else {     
+        return await response.json();
+    }
 }
 
 export async function post<T = any>(
@@ -145,21 +149,22 @@ export async function httpDelete<T = any>(
 
 export async function checkResponse(
     response: Response,
+    responseType?: string,
     message?: string
 ): Promise<void> {
     if (!response.ok) {
         // Try to read the error body of the response
-        let error: Record<string, any> | undefined;
+        let errors: Record<string, any>[] | undefined;
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.indexOf("application/json") !== -1) {
             try {
                 const responseJson = await response.json();
-                error = responseJson?.Error || responseJson;
+                errors = responseJson?.errors || responseJson;
             } catch {
                 // Swallow errors reading the response so that we don't mask the original failure
             }
         }
-        throw new SalesforceRequestError(response.status, error, message);
+        throw new SalesforceRequestError(response.status, errors, message);
     }
 }
 
