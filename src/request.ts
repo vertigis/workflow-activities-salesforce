@@ -14,8 +14,8 @@ export async function get<T = any>(
     path: string,
     query?: Record<string, string | number | boolean | null | undefined>,
     headers?: Record<string, any>,
-    expectedResponse?: string
-): Promise<T | undefined> {
+    expectedResponse?: "blob" | "json"
+): Promise<T> {
     if (!service.instanceUrl) {
         throw new Error("instanceUrl is required");
     }
@@ -24,11 +24,10 @@ export async function get<T = any>(
     }
     const qs = objectToQueryString({ ...query });
     const url = `${service.instanceUrl}/${path}${qs ? "?" + qs : ""}`;
-    let result: T | undefined;
     for (let i = 0; i < MAX_ATTEMPTS; i++) {
         const response = await fetch(url, {
             headers: {
-                Accept: "application/json",
+                Accept: expectedResponse === "blob" ? "*/*" : "application/json",
                 ...getAuthHeaders(service),
                 ...headers,
             },
@@ -36,14 +35,14 @@ export async function get<T = any>(
 
         if (await checkResponse(response, service)) {
             if (expectedResponse === "blob") {
-                result = await response.blob() as T;
+                return await response.blob() as T;
             } else {
-                result = await response.json();
+                return await response.json();
             }
             break;
         }
     }
-    return result;
+    throw new Error(`Unable to complete Salesforce GET request to: ${url}`);
 }
 
 export async function post<T = any>(
@@ -51,7 +50,7 @@ export async function post<T = any>(
     path: string,
     body?: Record<string, any>,
     headers?: Record<string, any>
-): Promise<T | undefined> {
+): Promise<T> {
     if (!service.instanceUrl) {
         throw new Error("url is required");
     }
@@ -59,7 +58,6 @@ export async function post<T = any>(
         throw new Error("accessToken is required");
     }
     const url = `${service.instanceUrl}${path}`;
-    let result: T | undefined;
     for (let i = 0; i < MAX_ATTEMPTS; i++) {
         const response = await fetch(url, {
             method: "POST",
@@ -78,15 +76,15 @@ export async function post<T = any>(
                 response.headers.get("content-length") === "0"
             ) {
                 // No content
-                result = {} as T;
+                return {} as T;
             } else {
-                result = await response.json();
+                return await response.json();
             }
             break;
 
         }
     }
-    return result;
+    throw new Error(`Unable to complete Salesforce POST request to: ${url}`);
 }
 
 export async function patch<T = any>(
@@ -94,7 +92,7 @@ export async function patch<T = any>(
     path: string,
     body?: Record<string, any>,
     headers?: Record<string, any>
-): Promise<T | undefined> {
+): Promise<T> {
     if (!service.instanceUrl) {
         throw new Error("url is required");
     }
@@ -102,7 +100,6 @@ export async function patch<T = any>(
         throw new Error("accessToken is required");
     }
     const url = `${service.instanceUrl}${path}`;
-    let result: T | undefined;
     for (let i = 0; i < MAX_ATTEMPTS; i++) {
         const response = await fetch(url, {
             method: "PATCH",
@@ -121,13 +118,13 @@ export async function patch<T = any>(
                 response.headers.get("content-length") === "0"
             ) {
                 // No content
-                result = {} as T;
+                return {} as T;
             } else {
-                result = await response.json();
+                return await response.json();
             }
         }
     }
-    return result;
+    throw new Error(`Unable to complete Salesforce PATCH request to: ${url}`);
 }
 
 export async function httpDelete<T = any>(
@@ -135,7 +132,7 @@ export async function httpDelete<T = any>(
     path: string,
     body?: Record<string, any>,
     headers?: Record<string, any>
-): Promise<T | undefined> {
+): Promise<T> {
     if (!service.instanceUrl) {
         throw new Error("url is required");
     }
@@ -143,7 +140,6 @@ export async function httpDelete<T = any>(
         throw new Error("accessToken is required");
     }
     const url = `${service.instanceUrl}${path}`;
-    let result: T | undefined;
     for (let i = 0; i < MAX_ATTEMPTS; i++) {
         const response = await fetch(url, {
             method: "DELETE",
@@ -160,13 +156,13 @@ export async function httpDelete<T = any>(
         }
         if (response && response.status === 204) {
             // No content
-            result = {} as T;
+            return {} as T;
         } else {
-            result = await response.json();
+            return await response.json();
         }
     }
 
-    return result;
+    throw new Error(`Unable to complete Salesforce DELETE request to: ${url}`);
 }
 
 export async function checkResponse(

@@ -3,13 +3,11 @@ import type { IActivityHandler } from "@vertigis/workflow";
 import { SalesforceService, SalesforceToken } from "../SalesforceService";
 import { checkResponse } from "../request";
 
-const thisScript = (document.currentScript as HTMLScriptElement)?.src;
-
 /** An interface that defines the inputs of the activity. */
 interface CreateSalesforceServiceInputs {
     /**
      * @displayName URL
-     * @description The full url to your organization's salesforce instance. (e.g. acme.my.salesforce.com)
+     * @description The full url to your organization's salesforce instance. (e.g. https://acme.my.salesforce.com)
      * @required
      */
     url: string;
@@ -79,10 +77,7 @@ export default class CreateSalesforceService implements IActivityHandler {
         const authorizationUri = `${saleforceUri}/services/oauth2/authorize`;
         const tokenUri = `${saleforceUri}/services/oauth2/token`;
 
-        // TODO: dynamically determine this
-        console.log(thisScript);
-
-
+        const formattedVersion = encodeURIComponent(typeof version === "number" ?  (Math.round(version * 10) / 10).toFixed(1).toString() : version);
 
         // Assemble OAuth URL
         const qs = objectToQueryString({
@@ -109,7 +104,7 @@ export default class CreateSalesforceService implements IActivityHandler {
                     service: {
                         token: token,
                         instanceUrl: url,
-                        version: version.toString(),
+                        version: formattedVersion,
                         clientId: clientId,
                         redirectUri: redirectUri,
                     }

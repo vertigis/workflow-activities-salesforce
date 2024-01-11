@@ -59,7 +59,10 @@ export default class UpdateSalesforceObject implements IActivityHandler {
         }          
 
               
-        const path = `/services/data/v${salesforceService.version}/sobjects/${sObject}/${id}`;
+        const encodedSObject = encodeURIComponent(sObject);
+        const encodedId = encodeURIComponent(id);
+        const path = `/services/data/v${salesforceService.version}/sobjects/${encodedSObject}/${encodedId}`;
+        
         await patch(salesforceService, path, salesforceObjectFields);
 
     }

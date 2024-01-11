@@ -48,7 +48,10 @@ export default class DeleteSalesforceObject implements IActivityHandler {
         if (!sObject) {
             throw new Error("sObject is required");
         }
-        const path = `/services/data/v${salesforceService.version}/sobjects/${sObject}/${id}`;
+
+        const encodedSObject = encodeURIComponent(sObject);
+        const encodedId = encodeURIComponent(id);
+        const path = `/services/data/v${salesforceService.version}/sobjects/${encodedSObject}/${encodedId}`;
         await httpDelete(salesforceService, path);
 
     }

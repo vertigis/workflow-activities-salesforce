@@ -31,7 +31,6 @@ interface GetSalesforceObjectInputs {
 
 }
 
-/** An interface that defines the outputs of the activity. */
 interface GetSalesforceObjectOutputs {
     /**
      * @description The salesforce object.
@@ -62,8 +61,9 @@ export default class GetSalesforceObject implements IActivityHandler {
         if (!id) {
             throw new Error("id is required");
         }
-        const path = `/services/data/v${salesforceService.version}/sobjects/${sObject}/${id}`;
-
+        const encodedSObject = encodeURIComponent(sObject);
+        const encodedId = encodeURIComponent(id);
+        const path = `/services/data/v${salesforceService.version}/sobjects/${encodedSObject}/${encodedId}`;
         const query = fields ? {
             fields: fields?.join(","),
         } : undefined;
