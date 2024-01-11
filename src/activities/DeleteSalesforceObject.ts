@@ -45,7 +45,7 @@ export default class DeleteSalesforceObject implements IActivityHandler {
             throw new Error("id is required");
         }
         if (!sObject) {
-            throw new Error("objectType is required");
+            throw new Error("sObject is required");
         }
         const path = `/services/data/v${salesforceService.version}/sobjects/${sObject}/${id}`;
         await httpDelete(salesforceService, path);

@@ -52,7 +52,7 @@ export default class CreateSalesforceObject implements IActivityHandler {
             throw new Error("salesforceObject is required");
         }
         if (!sObject) {
-            throw new Error("objectType is required");
+            throw new Error("sObject is required");
         }               
         const path = `/services/data/v${salesforceService.version}/sobjects/${sObject}`;
         const response = await post(salesforceService, path, salesforceObject);

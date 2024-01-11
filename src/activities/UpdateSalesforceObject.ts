@@ -51,7 +51,7 @@ export default class UpdateSalesforceObject implements IActivityHandler {
             throw new Error("salesforceObjectFields is required");
         }
         if (!sObject) {
-            throw new Error("objectType is required");
+            throw new Error("sObject is required");
         }  
         if (!id) {
             throw new Error("id is required");

@@ -11,11 +11,9 @@ export { default as GetSalesforceObject } from "./activities/GetSalesforceObject
 
 export { default as GetSalesforceObjectMetadata } from "./activities/GetSalesforceObjectMetadata";
 
-export { default as OAuthSignIn } from "./activities/OAuthSignIn";
-
 export { default as QuerySalesforce } from "./activities/QuerySalesforce";
 
 export { default as SendSalesforceRequest } from "./activities/SendSalesforceRequest";
 
-export { default as UpdateSalesforceObject } from "./activities/UpdateSalesforceObject";
+export { default as UpdateSalesforceObject } from "./activities/UpdateSalesforceObject"; 
 

@@ -43,7 +43,7 @@ export default class GetSalesforceObjectMetadata implements IActivityHandler {
         }
 
         if (!sObject) {
-            throw new Error("objectType is required");
+            throw new Error("sObject is required");
         }
 
         const path = `/services/data/v${salesforceService.version}/sobjects/${sObject}`;

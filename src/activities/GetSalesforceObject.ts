@@ -56,7 +56,7 @@ export default class GetSalesforceObject implements IActivityHandler {
             throw new Error("salesforceService is required");
         }
         if (!sObject) {
-            throw new Error("objectType is required");
+            throw new Error("sObject is required");
         }
         if (!id) {
             throw new Error("id is required");

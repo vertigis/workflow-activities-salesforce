@@ -1,9 +1,11 @@
-import { SalesforceService } from "./SalesforceService";
+import { SalesforceService, SalesforceToken } from "./SalesforceService";
 import { SalesforceRequestError } from "./SalesforceRequestError";
+
+const MAX_ATTEMPTS = 2;
 
 function getAuthHeaders(salesforceService: SalesforceService) {
     return {
-        Authorization: `Bearer ${salesforceService.accessToken}`,
+        Authorization: `Bearer ${salesforceService.token.access_token}`,
     };
 }
 
@@ -13,31 +15,35 @@ export async function get<T = any>(
     query?: Record<string, string | number | boolean | null | undefined>,
     headers?: Record<string, any>,
     expectedResponse?: string
-): Promise<T | Blob> {
+): Promise<T | undefined> {
     if (!service.instanceUrl) {
         throw new Error("instanceUrl is required");
     }
-    if (!service.accessToken) {
+    if (!service.token) {
         throw new Error("accessToken is required");
     }
     const qs = objectToQueryString({ ...query });
-    const url = `${service.instanceUrl}/${path}${
-        qs ? "?" + qs : ""
-    }`;
-    const response = await fetch(url, {
-        headers: {
-            Accept: "application/json",
-            ...getAuthHeaders(service),
-            ...headers,
-        },
-    });
+    const url = `${service.instanceUrl}/${path}${qs ? "?" + qs : ""}`;
+    let result: T | undefined;
+    for (let i = 0; i < MAX_ATTEMPTS; i++) {
+        const response = await fetch(url, {
+            headers: {
+                Accept: "application/json",
+                ...getAuthHeaders(service),
+                ...headers,
+            },
+        });
 
-    await checkResponse(response);
-    if(expectedResponse === "blob") {
-        return await response.blob();
-    } else {     
-        return await response.json();
+        if (await checkResponse(response, service)) {
+            if (expectedResponse === "blob") {
+                result = await response.blob() as T;
+            } else {
+                result = await response.json();
+            }
+            break;
+        }
     }
+    return result;
 }
 
 export async function post<T = any>(
@@ -45,36 +51,42 @@ export async function post<T = any>(
     path: string,
     body?: Record<string, any>,
     headers?: Record<string, any>
-): Promise<T> {
+): Promise<T | undefined> {
     if (!service.instanceUrl) {
         throw new Error("url is required");
     }
-    if (!service.accessToken) {
+    if (!service.token) {
         throw new Error("accessToken is required");
     }
     const url = `${service.instanceUrl}${path}`;
-    const response = await fetch(url, {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            ...getAuthHeaders(service),
-            ...headers,
-        },
-        body: JSON.stringify(body),
-    });
+    let result: T | undefined;
+    for (let i = 0; i < MAX_ATTEMPTS; i++) {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                ...getAuthHeaders(service),
+                ...headers,
+            },
+            body: JSON.stringify(body),
+        });
 
-    await checkResponse(response);
+        if (await checkResponse(response, service)) {
+            if (
+                response.status === 204 ||
+                response.headers.get("content-length") === "0"
+            ) {
+                // No content
+                result = {} as T;
+            }
 
-    if (
-        response.status === 204 ||
-        response.headers.get("content-length") === "0"
-    ) {
-        // No content
-        return {} as T;
+            result = await response.json();
+            break;
+
+        }
     }
-
-    return await response.json();
+    return result;
 }
 
 export async function patch<T = any>(
@@ -82,36 +94,40 @@ export async function patch<T = any>(
     path: string,
     body?: Record<string, any>,
     headers?: Record<string, any>
-): Promise<T> {
+): Promise<T | undefined> {
     if (!service.instanceUrl) {
         throw new Error("url is required");
     }
-    if (!service.accessToken) {
+    if (!service.token) {
         throw new Error("accessToken is required");
     }
     const url = `${service.instanceUrl}${path}`;
-    const response = await fetch(url, {
-        method: "PATCH",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            ...getAuthHeaders(service),
-            ...headers,
-        },
-        body: JSON.stringify(body),
-    });
+    let result: T | undefined;
+    for (let i = 0; i < MAX_ATTEMPTS; i++) {
+        const response = await fetch(url, {
+            method: "PATCH",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                ...getAuthHeaders(service),
+                ...headers,
+            },
+            body: JSON.stringify(body),
+        });
 
-    await checkResponse(response);
+        if (await checkResponse(response, service)) {
+            if (
+                response.status === 204 ||
+                response.headers.get("content-length") === "0"
+            ) {
+                // No content
+                result = {} as T;
+            }
 
-    if (
-        response.status === 204 ||
-        response.headers.get("content-length") === "0"
-    ) {
-        // No content
-        return {} as T;
+            result = await response.json();
+        }
     }
-
-    return await response.json();
+    return result;
 }
 
 export async function httpDelete<T = any>(
@@ -119,39 +135,52 @@ export async function httpDelete<T = any>(
     path: string,
     body?: Record<string, any>,
     headers?: Record<string, any>
-): Promise<T> {
+): Promise<T | undefined> {
     if (!service.instanceUrl) {
         throw new Error("url is required");
     }
-    if (!service.accessToken) {
+    if (!service.token) {
         throw new Error("accessToken is required");
     }
     const url = `${service.instanceUrl}${path}`;
-    const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-            Accept: "application/json",
-            ...getAuthHeaders(service),
-            ...headers,
-        },
-        body: JSON.stringify(body),
-    });
+    let result: T | undefined;
+    for (let i = 0; i < MAX_ATTEMPTS; i++) {
+        const response = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+                ...getAuthHeaders(service),
+                ...headers,
+            },
+            body: JSON.stringify(body),
+        });
 
-    await checkResponse(response);
+        if (await checkResponse(response)) {
+            break;
+        }
+        if (response && response.status === 204) {
+            // No content
+            result = {} as T;
+        }
 
-    if (response.status === 204) {
-        // No content
-        return {} as T;
+        result = await response.json();
     }
 
-    return await response.json();
+    return result;
 }
 
 export async function checkResponse(
     response: Response,
-    responseType?: string,
-    message?: string
-): Promise<void> {
+    service?: SalesforceService,
+    message?: string,
+): Promise<boolean> {
+    if (response.status === 401 && service) {
+        const token = await refreshToken(service);
+        if (token) {
+            service.token = token;
+            return false;
+        }
+    }
     if (!response.ok) {
         // Try to read the error body of the response
         let errors: Record<string, any>[] | undefined;
@@ -166,6 +195,7 @@ export async function checkResponse(
         }
         throw new SalesforceRequestError(response.status, errors, message);
     }
+    return true;
 }
 
 function objectToQueryString(
@@ -184,4 +214,31 @@ function objectToQueryString(
             )}`;
         })
         .join("&");
+}
+
+async function refreshToken(service: SalesforceService): Promise<SalesforceToken | undefined> {
+    const refreshUri = `${service.instanceUrl}/services/oauth2/token`;
+    const body = {
+        refresh_token: service.token.refresh_token,
+        grant_type: "refresh_token",
+        client_id: service.clientId,
+        redirect_uri: service.redirectUri,
+    }
+    const response = await fetch(refreshUri, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: objectToQueryString(body),
+    });
+
+    if (
+        response.status === 204 ||
+        response.headers.get("content-length") === "0"
+    ) {
+        // No content
+        return undefined;
+    }
+
+    return await response.json();
 }

@@ -73,7 +73,7 @@ export default class SendSalesforceRequest implements IActivityHandler {
             throw new Error("method is required");
         }
         if (!uri) {
-            throw new Error("path is required");
+            throw new Error("uri is required");
         }
 
         if (method == "GET") {
