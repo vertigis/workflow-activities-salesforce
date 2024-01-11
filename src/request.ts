@@ -79,9 +79,9 @@ export async function post<T = any>(
             ) {
                 // No content
                 result = {} as T;
+            } else {
+                result = await response.json();
             }
-
-            result = await response.json();
             break;
 
         }
@@ -122,9 +122,9 @@ export async function patch<T = any>(
             ) {
                 // No content
                 result = {} as T;
+            } else {
+                result = await response.json();
             }
-
-            result = await response.json();
         }
     }
     return result;
@@ -161,9 +161,9 @@ export async function httpDelete<T = any>(
         if (response && response.status === 204) {
             // No content
             result = {} as T;
+        } else {
+            result = await response.json();
         }
-
-        result = await response.json();
     }
 
     return result;
