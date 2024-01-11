@@ -17,6 +17,7 @@ interface CreateSalesforceObjectInputs {
     salesforceObject: Record<string, string | number | boolean | null | undefined>;
 
     /**
+     * @displayName sObject
      * @description The name of the salesforce sObject. For example, Account.
      * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_basic_info.htm
      * @required
