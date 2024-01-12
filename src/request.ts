@@ -139,7 +139,9 @@ export async function httpDelete(
             },
             body: JSON.stringify(body),
         });
-        await checkResponse(response);
+        if(!await checkResponse(response)) {
+            continue;
+        }
 
     }
 
