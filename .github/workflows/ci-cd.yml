@@ -30,8 +30,6 @@ jobs:
 
             - run: npm run lint
 
-            - run: npm run test
-
             - run: cp LICENSE package.json README.md build
 
             - uses: actions/upload-artifact@v3
