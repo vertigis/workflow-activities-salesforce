@@ -17,10 +17,12 @@ interface GetSalesforceObjectInputs {
     id: string;
 
     /**
-     * @description The name of the object. For example, Account.
+     * @displayName sObject
+     * @description The name of the salesforce sObject. For example, Account.
+     * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_basic_info.htm
      * @required
      */
-    objectType: string;
+    sObject: string;
 
     /**
      * @description The list of fields to be returned with the object.
@@ -29,7 +31,6 @@ interface GetSalesforceObjectInputs {
 
 }
 
-/** An interface that defines the outputs of the activity. */
 interface GetSalesforceObjectOutputs {
     /**
      * @description The salesforce object.
@@ -41,6 +42,7 @@ interface GetSalesforceObjectOutputs {
  * @category Salesforce
  * @defaultName sfObject
  * @description Gets a salesforce object given its Url. You can specify the fields you want to retrieve with the optional fields parameter. If you don’t use the fields parameter, the request retrieves all standard and custom fields from the record.
+ * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_retrieve_get.htm
  * @clientOnly
  * @supportedApps EXB, GWV, WAB
  */
@@ -48,19 +50,20 @@ export default class GetSalesforceObject implements IActivityHandler {
     /** Perform the execution logic of the activity. */
     async execute(inputs: GetSalesforceObjectInputs): Promise<GetSalesforceObjectOutputs> {
 
-        const { salesforceService, objectType, id, fields } = inputs;
+        const { salesforceService, sObject, id, fields } = inputs;
 
         if (!salesforceService) {
             throw new Error("salesforceService is required");
         }
-        if (!objectType) {
-            throw new Error("objectType is required");
+        if (!sObject) {
+            throw new Error("sObject is required");
         }
         if (!id) {
             throw new Error("id is required");
         }
-        const path = `/services/data/v${salesforceService.version}/sobjects/${objectType}/${id}`;
-
+        const encodedSObject = encodeURIComponent(sObject);
+        const encodedId = encodeURIComponent(id);
+        const path = `/services/data/v${salesforceService.version}/sobjects/${encodedSObject}/${encodedId}`;
         const query = fields ? {
             fields: fields?.join(","),
         } : undefined;

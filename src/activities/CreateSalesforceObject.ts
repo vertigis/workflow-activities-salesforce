@@ -17,10 +17,12 @@ interface CreateSalesforceObjectInputs {
     salesforceObject: Record<string, string | number | boolean | null | undefined>;
 
     /**
-     * @description The name of the object. For example, Account.
+     * @displayName sObject
+     * @description The name of the salesforce sObject. For example, Account.
+     * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_basic_info.htm
      * @required
      */
-    objectType: string;
+    sObject: string;
 
 }
 
@@ -35,13 +37,14 @@ interface CreateSalesforceObjectOutputs {
  * @category Salesforce
  * @defaultName sfCreate
  * @description Creates a Salesforce object.
+ * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_basic_info_post.htm
  * @clientOnly
  * @supportedApps EXB, GWV, WAB
  */
 export default class CreateSalesforceObject implements IActivityHandler {
 
     async execute(inputs: CreateSalesforceObjectInputs): Promise<CreateSalesforceObjectOutputs> {
-        const { salesforceService, salesforceObject, objectType } = inputs;
+        const { salesforceService, salesforceObject, sObject } = inputs;
 
         if (!salesforceService) {
             throw new Error("salesforceService is required");
@@ -49,10 +52,12 @@ export default class CreateSalesforceObject implements IActivityHandler {
         if (!salesforceObject) {
             throw new Error("salesforceObject is required");
         }
-        if (!objectType) {
-            throw new Error("objectType is required");
+        if (!sObject) {
+            throw new Error("sObject is required");
         }               
-        const path = `/services/data/v${salesforceService.version}/sobjects/${objectType}`;
+        const encodedSObject = encodeURIComponent(sObject);
+        
+        const path = `/services/data/v${salesforceService.version}/sobjects/${encodedSObject}`;
         const response = await post(salesforceService, path, salesforceObject);
         return {
             result: response,

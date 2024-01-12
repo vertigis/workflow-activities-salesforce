@@ -17,10 +17,11 @@ export interface SendSalesforceRequestInputs {
     method: "GET" | "POST" | "PATCH" | "DELETE";
 
     /**
-     * @description The Salesforce REST API object or operation to request.
+     * @description The Salesforce sObject REST API uri to request. This part of the sObject Basic Information attributes.
+     * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_list.htm
      * @required
      */
-    path: string;
+    uri: string;
 
     /**
      * @description The query string parameters to send on the request.
@@ -42,6 +43,12 @@ export interface SendSalesforceRequestInputs {
     headers?: {
         [key: string]: any;
     };
+
+    /**
+     * @description The content expected to be returned in the response (json or blob).
+     */
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    expectedResponse?: "json" | "blob";
 }
 
 /** An interface that defines the outputs of the activity. */
@@ -56,6 +63,7 @@ export interface SendSalesforceRequestOutputs {
  * @category Salesforce
  * @defaultName sfRequest
  * @description Sends a request to the Salesforce REST API.
+ * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_list.htm
  * @clientOnly
  * @supportedApps EXB, GWV, WAB
  */
@@ -63,19 +71,23 @@ export default class SendSalesforceRequest implements IActivityHandler {
     async execute(
         inputs: SendSalesforceRequestInputs
     ): Promise<SendSalesforceRequestOutputs> {
-        const { body, headers, method, path, query, service } = inputs;
+        const { body, headers, method, uri, query, service, expectedResponse } = inputs;
         if (!service) {
             throw new Error("service is required");
         }
         if (!method) {
             throw new Error("method is required");
         }
-        if (!path) {
-            throw new Error("path is required");
+        if (!uri) {
+            throw new Error("uri is required");
         }
 
+        //force the current version
+        let path = uri.replace(/\/v\d+\.\d+\//, `/v${service.version}/`);
+        path = "/" + path.replace(/^\/|\/$/g, "");
+
         if (method == "GET") {
-            const response = await get(service, path, query, headers);
+            const response = await get(service, path, query, headers, expectedResponse);
             return {
                 result: response,
             };

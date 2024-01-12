@@ -11,7 +11,7 @@ interface QuerySalesforceInputs {
     salesforceService: SalesforceService;    
     /**
      * @displayName SOQL
-     * @description The  Salesforce Object Query Language (SOQL) to search your organization’s Salesforce data for specific information. 
+     * @description The Salesforce Object Query Language (SOQL) to search your organization’s Salesforce data for specific information. 
      * @required
      */
     soql: string;
