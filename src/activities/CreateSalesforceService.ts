@@ -36,7 +36,7 @@ interface CreateSalesforceServiceInputs {
      * @description The redirect page timeout in seconds (optional).
      */
     timeout?: number;
-    
+
     /* eslint-enable @typescript-eslint/no-redundant-type-constituents */
 }
 
@@ -56,7 +56,7 @@ interface CreateSalesforceServiceOutputs {
  */
 export default class CreateSalesforceService implements IActivityHandler {
     async execute(
-        inputs: CreateSalesforceServiceInputs
+        inputs: CreateSalesforceServiceInputs,
     ): Promise<CreateSalesforceServiceOutputs> {
         const { url, version, clientId, redirectUri, timeout } = inputs;
 
@@ -114,7 +114,7 @@ export default class CreateSalesforceService implements IActivityHandler {
 async function authenticate(
     uri: URL,
     redirectUri: string,
-    timeout?: number
+    timeout?: number,
 ): Promise<string> {
     // Compute window dimensions and position
     const windowArea = {
@@ -124,10 +124,10 @@ async function authenticate(
         top: 0,
     };
     windowArea.left = Math.floor(
-        window.screenX + (window.outerWidth - windowArea.width) / 2
+        window.screenX + (window.outerWidth - windowArea.width) / 2,
     );
     windowArea.top = Math.floor(
-        window.screenY + (window.outerHeight - windowArea.height) / 2
+        window.screenY + (window.outerHeight - windowArea.height) / 2,
     );
     const windowOpts = `toolbar=0,scrollbars=1,status=1,resizable=1,location=1,menuBar=0,width=${windowArea.width},height=${windowArea.height},left=${windowArea.left},top=${windowArea.top}`;
 
@@ -166,16 +166,19 @@ async function authenticate(
         };
         window.addEventListener("message", onMessage, { once: false });
 
-        timeoutHandle = window.setTimeout(() => {
-            window.clearInterval(checkClosedHandle);
-            window.removeEventListener("message", onMessage);
-            try {
-                authWindow?.close();
-            } catch {
-                //do nothing
-            }
-            return reject("timeout");
-        }, (timeout || 60) * 1000);
+        timeoutHandle = window.setTimeout(
+            () => {
+                window.clearInterval(checkClosedHandle);
+                window.removeEventListener("message", onMessage);
+                try {
+                    authWindow?.close();
+                } catch {
+                    //do nothing
+                }
+                return reject("timeout");
+            },
+            (timeout || 60) * 1000,
+        );
     });
 }
 
@@ -187,7 +190,7 @@ function generateRandomState(): string {
 
 async function getToken<T = SalesforceToken>(
     url: string,
-    body?: Record<string, string>
+    body?: Record<string, string>,
 ): Promise<T> {
     const response = await fetch(url, {
         method: "POST",

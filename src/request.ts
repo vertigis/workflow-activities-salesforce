@@ -12,7 +12,7 @@ export function get<T = any>(
     path: string,
     query?: Record<string, string | number | boolean | null | undefined>,
     headers?: Record<string, any>,
-    expectedResponse?: "blob" | "json"
+    expectedResponse?: "blob" | "json",
 ): Promise<T> {
     return httpRequest(
         service,
@@ -21,7 +21,7 @@ export function get<T = any>(
         query,
         undefined,
         headers,
-        expectedResponse
+        expectedResponse,
     );
 }
 
@@ -29,7 +29,7 @@ export function post<T = any>(
     service: SalesforceService,
     path: string,
     body?: Record<string, any>,
-    headers?: Record<string, any>
+    headers?: Record<string, any>,
 ): Promise<T> {
     return httpRequest(service, "POST", path, undefined, body, headers);
 }
@@ -38,7 +38,7 @@ export function patch<T = any>(
     service: SalesforceService,
     path: string,
     body?: Record<string, any>,
-    headers?: Record<string, any>
+    headers?: Record<string, any>,
 ): Promise<T> {
     return httpRequest(service, "PATCH", path, undefined, body, headers);
 }
@@ -47,7 +47,7 @@ export function httpDelete<T = any>(
     service: SalesforceService,
     path: string,
     body?: Record<string, any>,
-    headers?: Record<string, any>
+    headers?: Record<string, any>,
 ): Promise<T> {
     return httpRequest(service, "DELETE", path, undefined, body, headers);
 }
@@ -60,7 +60,7 @@ async function httpRequest<T = any>(
     body?: Record<string, any>,
     headers?: Record<string, any>,
     expectedResponse?: "blob" | "json",
-    allowTokenRefresh?: boolean
+    allowTokenRefresh?: boolean,
 ): Promise<T> {
     if (!service.instanceUrl) {
         throw new Error("url is required");
@@ -99,7 +99,7 @@ async function httpRequest<T = any>(
                     body,
                     headers,
                     expectedResponse,
-                    false
+                    false,
                 );
             }
         }
@@ -147,7 +147,7 @@ export async function getResponseError(response: Response) {
 }
 
 async function refreshToken(
-    service: SalesforceService
+    service: SalesforceService,
 ): Promise<SalesforceToken | undefined> {
     const refreshUri = `${service.instanceUrl}/services/oauth2/token`;
     const body = {

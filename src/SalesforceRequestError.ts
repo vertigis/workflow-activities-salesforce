@@ -5,7 +5,7 @@ export class SalesforceRequestError extends Error {
     constructor(
         statusCode: number,
         errors?: Record<string, any>[],
-        message?: string
+        message?: string,
     ) {
         super(message || "Salesforce request failed.");
         this.errors = errors;

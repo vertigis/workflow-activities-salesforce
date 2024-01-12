@@ -44,7 +44,7 @@ interface CreateSalesforceObjectOutputs {
  */
 export default class CreateSalesforceObject implements IActivityHandler {
     async execute(
-        inputs: CreateSalesforceObjectInputs
+        inputs: CreateSalesforceObjectInputs,
     ): Promise<CreateSalesforceObjectOutputs> {
         const { salesforceService, salesforceObject, sObject } = inputs;
 

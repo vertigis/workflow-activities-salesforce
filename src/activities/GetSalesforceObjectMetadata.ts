@@ -35,7 +35,7 @@ interface GetSalesforceObjectMetadataOutputs {
  */
 export default class GetSalesforceObjectMetadata implements IActivityHandler {
     async execute(
-        inputs: GetSalesforceObjectMetadataInputs
+        inputs: GetSalesforceObjectMetadataInputs,
     ): Promise<GetSalesforceObjectMetadataOutputs> {
         const { salesforceService, sObject } = inputs;
 

@@ -46,7 +46,7 @@ interface GetSalesforceObjectOutputs {
  */
 export default class GetSalesforceObject implements IActivityHandler {
     async execute(
-        inputs: GetSalesforceObjectInputs
+        inputs: GetSalesforceObjectInputs,
     ): Promise<GetSalesforceObjectOutputs> {
         const { salesforceService, sObject, id, fields } = inputs;
 

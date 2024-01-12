@@ -103,7 +103,7 @@ export interface SendSalesforceRequestOutputs {
  */
 export default class SendSalesforceRequest implements IActivityHandler {
     async execute(
-        inputs: SendSalesforceRequestInputs
+        inputs: SendSalesforceRequestInputs,
     ): Promise<SendSalesforceRequestOutputs> {
         const { body, headers, method, uri, query, service, expectedResponse } =
             inputs;
@@ -127,7 +127,7 @@ export default class SendSalesforceRequest implements IActivityHandler {
                 path,
                 query,
                 headers,
-                expectedResponse
+                expectedResponse,
             );
             return {
                 result: response,

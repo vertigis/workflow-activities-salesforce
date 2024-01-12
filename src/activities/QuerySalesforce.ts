@@ -38,7 +38,7 @@ interface QuerySalesforceOutputs {
  */
 export default class QuerySalesforce implements IActivityHandler {
     async execute(
-        inputs: QuerySalesforceInputs
+        inputs: QuerySalesforceInputs,
     ): Promise<QuerySalesforceOutputs> {
         const { soql, salesforceService } = inputs;
 
