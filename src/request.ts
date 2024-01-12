@@ -12,16 +12,24 @@ export function get<T = any>(
     path: string,
     query?: Record<string, string | number | boolean | null | undefined>,
     headers?: Record<string, any>,
-    expectedResponse?: "blob" | "json"
+    expectedResponse?: "blob" | "json",
 ): Promise<T> {
-    return httpRequest(service, "GET", path, query, undefined, headers, expectedResponse);
+    return httpRequest(
+        service,
+        "GET",
+        path,
+        query,
+        undefined,
+        headers,
+        expectedResponse,
+    );
 }
 
 export function post<T = any>(
     service: SalesforceService,
     path: string,
     body?: Record<string, any>,
-    headers?: Record<string, any>
+    headers?: Record<string, any>,
 ): Promise<T> {
     return httpRequest(service, "POST", path, undefined, body, headers);
 }
@@ -30,7 +38,7 @@ export function patch<T = any>(
     service: SalesforceService,
     path: string,
     body?: Record<string, any>,
-    headers?: Record<string, any>
+    headers?: Record<string, any>,
 ): Promise<T> {
     return httpRequest(service, "PATCH", path, undefined, body, headers);
 }
@@ -39,7 +47,7 @@ export function httpDelete<T = any>(
     service: SalesforceService,
     path: string,
     body?: Record<string, any>,
-    headers?: Record<string, any>
+    headers?: Record<string, any>,
 ): Promise<T> {
     return httpRequest(service, "DELETE", path, undefined, body, headers);
 }
@@ -83,7 +91,16 @@ async function httpRequest<T = any>(
     if (error) {
         if (error.statusCode === 401 && allowTokenRefresh !== false) {
             if (await tryRefreshToken(service)) {
-                return httpRequest(service, method, path, query, body, headers, expectedResponse, false);
+                return httpRequest(
+                    service,
+                    method,
+                    path,
+                    query,
+                    body,
+                    headers,
+                    expectedResponse,
+                    false,
+                );
             }
         }
         throw error;
@@ -109,7 +126,7 @@ async function tryRefreshToken(service: SalesforceService): Promise<boolean> {
     } catch {
         // Swallow errors
     }
-    return false
+    return false;
 }
 
 export async function getResponseError(response: Response) {
@@ -129,14 +146,16 @@ export async function getResponseError(response: Response) {
     }
 }
 
-async function refreshToken(service: SalesforceService): Promise<SalesforceToken | undefined> {
+async function refreshToken(
+    service: SalesforceService,
+): Promise<SalesforceToken | undefined> {
     const refreshUri = `${service.instanceUrl}/services/oauth2/token`;
     const body = {
         refresh_token: service.token.refresh_token,
         grant_type: "refresh_token",
         client_id: service.clientId,
         redirect_uri: service.redirectUri,
-    }
+    };
     const response = await fetch(refreshUri, {
         method: "POST",
         headers: {

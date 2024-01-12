@@ -2,17 +2,16 @@ import type { IActivityHandler } from "@vertigis/workflow";
 import { SalesforceService } from "../SalesforceService";
 import { get } from "../request";
 
-/** An interface that defines the inputs of the activity. */
 interface GetSalesforceObjectMetadataInputs {
     /**
-    * @description The Salesforce API Service.
-    * @required
-    */
+     * @description The Salesforce API Service.
+     * @required
+     */
     salesforceService: SalesforceService;
 
     /**
      * @displayName sObject
-     * @description The name of the salesforce sObject. For example, Account.
+     * @description The name of the Salesforce sObject. For example, Account.
      * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_basic_info.htm
      * @required
      */
@@ -35,9 +34,10 @@ interface GetSalesforceObjectMetadataOutputs {
  * @supportedApps EXB, GWV, WAB
  */
 export default class GetSalesforceObjectMetadata implements IActivityHandler {
-    async execute(inputs: GetSalesforceObjectMetadataInputs): Promise<GetSalesforceObjectMetadataOutputs> {
-
-        const { salesforceService, sObject} = inputs;
+    async execute(
+        inputs: GetSalesforceObjectMetadataInputs,
+    ): Promise<GetSalesforceObjectMetadataOutputs> {
+        const { salesforceService, sObject } = inputs;
 
         if (!salesforceService) {
             throw new Error("salesforceService is required");

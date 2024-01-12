@@ -1,7 +1,12 @@
 module.exports = {
-    extends: [require.resolve("@vertigis/workflow-sdk/config/.eslintrc")],
+    extends: [
+        require.resolve("@vertigis/workflow-sdk/config/.eslintrc"),
+        "plugin:eslint-comments/recommended"
+    ],
     parserOptions: {
         tsconfigRootDir: __dirname,
     },
-    rules: {},
+    rules: {
+        "eslint-comments/no-unused-disable": "error"
+    },
 };

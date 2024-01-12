@@ -1,25 +1,36 @@
 {
-    "name": "vertigis-workflow-project",
-    "private": true,
-    "version": "1.0.0",
-    "description": "",
-    "license": "UNLICENSED",
-    "author": "",
+    "name": "@vertigis/workflow-activities-salesforce",
+    "version": "0.0.0-semantically-released",
+    "description": "Salesforce activities for VertiGIS Studio Workflow",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/vertigis/workflow-activities-salesforce.git"
+    },
+    "license": "MIT",
+    "author": "VertiGIS",
+    "homepage": "https://github.com/vertigis/workflow-activities-salesforce#readme",
+    "keywords": [
+        "VertiGIS",
+        "VertiGIS Studio",
+        "Workflow",
+        "Salesforce",
+        "ArcGIS",
+        "GIS"
+    ],
     "scripts": {
         "build": "vertigis-workflow-sdk build",
         "generate": "vertigis-workflow-sdk generate",
-        "start": "vertigis-workflow-sdk start",
-        "lint": "eslint -f codeframe --max-warnings 0 --ext .ts,.tsx src/",
-        "lint:fix": "eslint -f codeframe --max-warnings 0 --ext .ts,.tsx --fix src/",
-        "prettier": "prettier --write ./src"
-
+        "lint": "eslint --max-warnings 0 --ext .ts,.tsx src/",
+        "lint:fix": "eslint --max-warnings 0 --ext .ts,.tsx --fix src/",
+        "prettier": "prettier --write ./src",
+        "start": "vertigis-workflow-sdk start"
     },
     "devDependencies": {
         "@vertigis/workflow": "5.36.0",
         "@vertigis/workflow-sdk": "4.1.0",
+        "eslint-plugin-eslint-comments": "^3.2.0",
         "eslint-plugin-prettier": "^4.0.0",
-        "prettier": "^2.7.1",
-
+        "prettier": "^3.2.1",
         "typescript": "^4.0.2"
     },
     "browserslist": [
