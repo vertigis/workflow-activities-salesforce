@@ -2,7 +2,6 @@ import type { IActivityHandler } from "@vertigis/workflow";
 import { SalesforceService } from "../SalesforceService";
 import { get, httpDelete, patch, post } from "../request";
 
-/** An interface that defines the inputs of the activity. */
 export interface SendSalesforceRequestInputs {
     /**
      * @description The Salesforce API Service.
@@ -21,7 +20,39 @@ export interface SendSalesforceRequestInputs {
      * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_list.htm
      * @required
      */
-    uri: string;
+    uri: string |
+    "/services/data" |
+    "/services/data/vXX.X" |
+    "/services/data/vXX.X/actions/standard" |
+    "/services/data/vXX.X/actions/custom" |
+    "/services/data/vXX.X/async-queries" |
+    "/services/data/vXX.X/chatter" |
+    "/services/data/vXX.X/commerce" |
+    "/services/data/vXX.X/composite" |
+    "/services/data/vXX.X/composite/batch" |
+    "/services/data/vXX.X/composite/tree" |
+    "/services/data/vXX.X/composite/sobjects" |
+    "/services/data/vXX.X/limits" |
+    "/services/data/vXX.X/metadata" |
+    "/services/data/vXX.X/parameterizedSearch" |
+    "/services/data/vXX.X/query" |
+    "/services/data/vXX.X/queryAll" |
+    "/services/data/vXX.X/recent" |
+    "/services/data/vXX.X/search" |
+    "/services/data/vXX.X/sobjects" |
+    "/services/data/vXX.X/sobjects/eventName/eventSchema" |
+    "/services/data/vXX.X/sobjects/relevantItems" |
+    "/services/data/vXX.X/sobjects/sObject" |
+    "/services/data/vXX.X/sobjects/sObject/deleted" |
+    "/services/data/vXX.X/sobjects/sObject/describe" |
+    "/services/data/vXX.X/sobjects/sObject/fieldName/fieldValue" |
+    "/services/data/vXX.X/sobjects/sObject/id" |
+    "/services/data/vXX.X/sobjects/sObject/id/blobField" |
+    "/services/data/vXX.X/sobjects/sObject/id/relationshipName" |
+    "/services/data/vXX.X/sobjects/sObject/updated" |
+    "/services/data/vXX.X/support/dataCategoryGroups" |
+    "/services/data/vXX.X/support/dataCategoryGroups/group/​dataCategories/​category" |
+    "/services/data/vXX.X/support/knowledgeArticles/articleId";
 
     /**
      * @description The query string parameters to send on the request.
@@ -51,7 +82,6 @@ export interface SendSalesforceRequestInputs {
     expectedResponse?: "json" | "blob";
 }
 
-/** An interface that defines the outputs of the activity. */
 export interface SendSalesforceRequestOutputs {
     /**
      * @description The result of the activity.

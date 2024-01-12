@@ -2,7 +2,6 @@ import type { IActivityHandler } from "@vertigis/workflow";
 import { SalesforceService } from "../SalesforceService";
 import { get } from "../request";
 
-/** An interface that defines the inputs of the activity. */
 interface QuerySalesforceInputs {
     /**
      * @description The Salesforce API Service.

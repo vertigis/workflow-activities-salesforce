@@ -1,19 +1,18 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import type { IActivityHandler } from "@vertigis/workflow";
 import { SalesforceService, SalesforceToken } from "../SalesforceService";
 import { SalesforceRequestError } from "../SalesforceRequestError";
 
-/** An interface that defines the inputs of the activity. */
 interface CreateSalesforceServiceInputs {
     /**
      * @displayName URL
-     * @description The full url to your organization's salesforce instance. (e.g. https://acme.my.salesforce.com)
+     * @description The full URL to your organization's Salesforce instance. For example, https://acme.my.salesforce.com.
      * @required
      */
-    url: string;
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+    url: "https://acme.my.salesforce.com" | string;
 
     /**
-     * @description  The version of Salesforce to access.
+     * @description The version of Salesforce to access.
      * @required
      */
     // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
@@ -27,7 +26,7 @@ interface CreateSalesforceServiceInputs {
     clientId: string;
 
     /**
-     * @displayName Redirect Url
+     * @displayName Redirect URI
      * @description The redirect URI to which the OAuth 2.0 server will send its response.
      * @required
      */
@@ -41,10 +40,9 @@ interface CreateSalesforceServiceInputs {
 
 }
 
-/** An interface that defines the outputs of the activity. */
 interface CreateSalesforceServiceOutputs {
     /**
-     * @description The salesforce service that can be supplied to other salesforce activities.
+     * @description The Salesforce service that can be supplied to other Salesforce activities.
      */
     service: SalesforceService;
 }

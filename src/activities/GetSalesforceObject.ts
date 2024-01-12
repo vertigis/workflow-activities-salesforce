@@ -2,7 +2,6 @@ import type { IActivityHandler } from "@vertigis/workflow";
 import { SalesforceService } from "../SalesforceService";
 import { get } from "../request";
 
-/** An interface that defines the inputs of the activity. */
 interface GetSalesforceObjectInputs {
     /**
     * @description The Salesforce API Service.
@@ -18,7 +17,7 @@ interface GetSalesforceObjectInputs {
 
     /**
      * @displayName sObject
-     * @description The name of the salesforce sObject. For example, Account.
+     * @description The name of the Salesforce sObject. For example, Account.
      * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_basic_info.htm
      * @required
      */
@@ -33,7 +32,7 @@ interface GetSalesforceObjectInputs {
 
 interface GetSalesforceObjectOutputs {
     /**
-     * @description The salesforce object.
+     * @description The Salesforce object.
      */
     result: Record<string, object>;
 }
@@ -41,13 +40,12 @@ interface GetSalesforceObjectOutputs {
 /**
  * @category Salesforce
  * @defaultName sfObject
- * @description Gets a salesforce object given its Url. You can specify the fields you want to retrieve with the optional fields parameter. If you don’t use the fields parameter, the request retrieves all standard and custom fields from the record.
+ * @description Gets a Salesforce object given its Url. You can specify the fields you want to retrieve with the optional fields parameter. If you don’t use the fields parameter, the request retrieves all standard and custom fields from the record.
  * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_retrieve_get.htm
  * @clientOnly
  * @supportedApps EXB, GWV, WAB
  */
 export default class GetSalesforceObject implements IActivityHandler {
-    /** Perform the execution logic of the activity. */
     async execute(inputs: GetSalesforceObjectInputs): Promise<GetSalesforceObjectOutputs> {
 
         const { salesforceService, sObject, id, fields } = inputs;

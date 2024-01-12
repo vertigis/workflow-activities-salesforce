@@ -2,7 +2,6 @@ import type { IActivityHandler } from "@vertigis/workflow";
 import { SalesforceService } from "../SalesforceService";
 import { patch } from "../request";
 
-/** An interface that defines the inputs of the activity. */
 interface UpdateSalesforceObjectInputs {
     /**
     * @description The Salesforce API Service.
@@ -25,7 +24,7 @@ interface UpdateSalesforceObjectInputs {
 
     /**
      * @displayName sObject
-     * @description The name of the salesforce sObject. For example, Account.
+     * @description The name of the Salesforce sObject. For example, Account.
      * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_basic_info.htm
      * @required
      */
