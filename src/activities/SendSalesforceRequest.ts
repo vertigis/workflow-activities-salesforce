@@ -3,6 +3,8 @@ import { SalesforceService } from "../SalesforceService";
 import { get, httpDelete, patch, post } from "../request";
 
 export interface SendSalesforceRequestInputs {
+    /* eslint-disable @typescript-eslint/no-redundant-type-constituents */
+
     /**
      * @description The Salesforce API Service.
      * @required
@@ -79,8 +81,9 @@ export interface SendSalesforceRequestInputs {
     /**
      * @description The content expected to be returned in the response (json or blob).
      */
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     expectedResponse?: "json" | "blob";
+
+    /* eslint-enable @typescript-eslint/no-redundant-type-constituents */
 }
 
 export interface SendSalesforceRequestOutputs {
@@ -145,8 +148,8 @@ export default class SendSalesforceRequest implements IActivityHandler {
                 result: response,
             };
         } else {
-            // eslint-disable-next-line
-            throw new Error(`HTTP method '${method}' not supported.`);
+            method satisfies never;
+            throw new Error(`HTTP method '${method as string}' not supported.`);
         }
     }
 }

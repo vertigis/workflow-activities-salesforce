@@ -3,19 +3,19 @@ import { SalesforceService, SalesforceToken } from "../SalesforceService";
 import { SalesforceRequestError } from "../SalesforceRequestError";
 
 interface CreateSalesforceServiceInputs {
+    /* eslint-disable @typescript-eslint/no-redundant-type-constituents */
+
     /**
      * @displayName URL
      * @description The full URL to your organization's Salesforce instance. For example, https://acme.my.salesforce.com.
      * @required
      */
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     url: "https://acme.my.salesforce.com" | string;
 
     /**
      * @description The version of Salesforce to access.
      * @required
      */
-    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     version: "59.0" | string | number;
 
     /**
@@ -32,9 +32,12 @@ interface CreateSalesforceServiceInputs {
      */
     redirectUri: string;
 
-    /** @description The redirect page timeout in milliseconds (optional).
+    /**
+     * @description The redirect page timeout in seconds (optional).
      */
     timeout?: number;
+    
+    /* eslint-enable @typescript-eslint/no-redundant-type-constituents */
 }
 
 interface CreateSalesforceServiceOutputs {
@@ -165,7 +168,6 @@ async function authenticate(
 
         timeoutHandle = window.setTimeout(() => {
             window.clearInterval(checkClosedHandle);
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
             window.removeEventListener("message", onMessage);
             try {
                 authWindow?.close();
@@ -173,7 +175,7 @@ async function authenticate(
                 //do nothing
             }
             return reject("timeout");
-        }, timeout || 60000);
+        }, (timeout || 60) * 1000);
     });
 }
 
