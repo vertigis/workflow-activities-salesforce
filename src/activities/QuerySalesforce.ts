@@ -47,7 +47,7 @@ export default class QuerySalesforce implements IActivityHandler {
         if (!salesforceService) {
             throw new Error("salesforceService is required");
         }
-        const path = `services/data/v${salesforceService.version}/query`;
+        const path = `/services/data/v${salesforceService.version}/query`;
         const query = {
             q: soql,
         };

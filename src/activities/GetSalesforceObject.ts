@@ -63,7 +63,7 @@ export default class GetSalesforceObject implements IActivityHandler {
         }
         const encodedSObject = encodeURIComponent(sObject);
         const encodedId = encodeURIComponent(id);
-        const path = `services/data/v${salesforceService.version}/sobjects/${encodedSObject}/${encodedId}`;
+        const path = `/services/data/v${salesforceService.version}/sobjects/${encodedSObject}/${encodedId}`;
         const query = fields ? {
             fields: fields?.join(","),
         } : undefined;
