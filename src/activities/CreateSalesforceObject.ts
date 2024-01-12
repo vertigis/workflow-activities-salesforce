@@ -13,7 +13,10 @@ interface CreateSalesforceObjectInputs {
      * @description The object to be updated.  This must include any field/value pairs in the Salesforce record to be updated.
      * @required
      */
-    salesforceObject: Record<string, string | number | boolean | null | undefined>;
+    salesforceObject: Record<
+        string,
+        string | number | boolean | null | undefined
+    >;
 
     /**
      * @displayName sObject
@@ -22,7 +25,6 @@ interface CreateSalesforceObjectInputs {
      * @required
      */
     sObject: string;
-
 }
 
 interface CreateSalesforceObjectOutputs {
@@ -41,26 +43,26 @@ interface CreateSalesforceObjectOutputs {
  * @supportedApps EXB, GWV, WAB
  */
 export default class CreateSalesforceObject implements IActivityHandler {
-
-    async execute(inputs: CreateSalesforceObjectInputs): Promise<CreateSalesforceObjectOutputs> {
+    async execute(
+        inputs: CreateSalesforceObjectInputs
+    ): Promise<CreateSalesforceObjectOutputs> {
         const { salesforceService, salesforceObject, sObject } = inputs;
 
         if (!salesforceService) {
             throw new Error("salesforceService is required");
-        }  
+        }
         if (!salesforceObject) {
             throw new Error("salesforceObject is required");
         }
         if (!sObject) {
             throw new Error("sObject is required");
-        }               
+        }
         const encodedSObject = encodeURIComponent(sObject);
-        
+
         const path = `/services/data/v${salesforceService.version}/sobjects/${encodedSObject}`;
         const response = await post(salesforceService, path, salesforceObject);
         return {
             result: response,
-        };  
-        
+        };
     }
 }

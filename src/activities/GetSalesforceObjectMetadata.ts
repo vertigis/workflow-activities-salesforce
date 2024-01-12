@@ -4,9 +4,9 @@ import { get } from "../request";
 
 interface GetSalesforceObjectMetadataInputs {
     /**
-    * @description The Salesforce API Service.
-    * @required
-    */
+     * @description The Salesforce API Service.
+     * @required
+     */
     salesforceService: SalesforceService;
 
     /**
@@ -34,9 +34,10 @@ interface GetSalesforceObjectMetadataOutputs {
  * @supportedApps EXB, GWV, WAB
  */
 export default class GetSalesforceObjectMetadata implements IActivityHandler {
-    async execute(inputs: GetSalesforceObjectMetadataInputs): Promise<GetSalesforceObjectMetadataOutputs> {
-
-        const { salesforceService, sObject} = inputs;
+    async execute(
+        inputs: GetSalesforceObjectMetadataInputs
+    ): Promise<GetSalesforceObjectMetadataOutputs> {
+        const { salesforceService, sObject } = inputs;
 
         if (!salesforceService) {
             throw new Error("salesforceService is required");

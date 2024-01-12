@@ -34,7 +34,6 @@ interface DeleteSalesforceObjectInputs {
  */
 export default class DeleteSalesforceObject implements IActivityHandler {
     async execute(inputs: DeleteSalesforceObjectInputs): Promise<void> {
-
         const { salesforceService, id, sObject } = inputs;
 
         if (!salesforceService) {
@@ -51,7 +50,5 @@ export default class DeleteSalesforceObject implements IActivityHandler {
         const encodedId = encodeURIComponent(id);
         const path = `/services/data/v${salesforceService.version}/sobjects/${encodedSObject}/${encodedId}`;
         await httpDelete(salesforceService, path);
-
     }
-
 }

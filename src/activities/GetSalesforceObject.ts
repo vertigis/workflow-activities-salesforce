@@ -4,9 +4,9 @@ import { get } from "../request";
 
 interface GetSalesforceObjectInputs {
     /**
-    * @description The Salesforce API Service.
-    * @required
-    */
+     * @description The Salesforce API Service.
+     * @required
+     */
     salesforceService: SalesforceService;
 
     /**
@@ -27,7 +27,6 @@ interface GetSalesforceObjectInputs {
      * @description The list of fields to be returned with the object.
      */
     fields?: string[];
-
 }
 
 interface GetSalesforceObjectOutputs {
@@ -46,8 +45,9 @@ interface GetSalesforceObjectOutputs {
  * @supportedApps EXB, GWV, WAB
  */
 export default class GetSalesforceObject implements IActivityHandler {
-    async execute(inputs: GetSalesforceObjectInputs): Promise<GetSalesforceObjectOutputs> {
-
+    async execute(
+        inputs: GetSalesforceObjectInputs
+    ): Promise<GetSalesforceObjectOutputs> {
         const { salesforceService, sObject, id, fields } = inputs;
 
         if (!salesforceService) {
@@ -62,9 +62,11 @@ export default class GetSalesforceObject implements IActivityHandler {
         const encodedSObject = encodeURIComponent(sObject);
         const encodedId = encodeURIComponent(id);
         const path = `/services/data/v${salesforceService.version}/sobjects/${encodedSObject}/${encodedId}`;
-        const query = fields ? {
-            fields: fields?.join(","),
-        } : undefined;
+        const query = fields
+            ? {
+                  fields: fields?.join(","),
+              }
+            : undefined;
         const response = await get(salesforceService, path, query);
         return {
             result: response,

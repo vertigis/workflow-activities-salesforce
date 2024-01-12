@@ -20,39 +20,40 @@ export interface SendSalesforceRequestInputs {
      * @helpUrl https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_list.htm
      * @required
      */
-    uri: string |
-    "/services/data" |
-    "/services/data/vXX.X" |
-    "/services/data/vXX.X/actions/standard" |
-    "/services/data/vXX.X/actions/custom" |
-    "/services/data/vXX.X/async-queries" |
-    "/services/data/vXX.X/chatter" |
-    "/services/data/vXX.X/commerce" |
-    "/services/data/vXX.X/composite" |
-    "/services/data/vXX.X/composite/batch" |
-    "/services/data/vXX.X/composite/tree" |
-    "/services/data/vXX.X/composite/sobjects" |
-    "/services/data/vXX.X/limits" |
-    "/services/data/vXX.X/metadata" |
-    "/services/data/vXX.X/parameterizedSearch" |
-    "/services/data/vXX.X/query" |
-    "/services/data/vXX.X/queryAll" |
-    "/services/data/vXX.X/recent" |
-    "/services/data/vXX.X/search" |
-    "/services/data/vXX.X/sobjects" |
-    "/services/data/vXX.X/sobjects/eventName/eventSchema" |
-    "/services/data/vXX.X/sobjects/relevantItems" |
-    "/services/data/vXX.X/sobjects/sObject" |
-    "/services/data/vXX.X/sobjects/sObject/deleted" |
-    "/services/data/vXX.X/sobjects/sObject/describe" |
-    "/services/data/vXX.X/sobjects/sObject/fieldName/fieldValue" |
-    "/services/data/vXX.X/sobjects/sObject/id" |
-    "/services/data/vXX.X/sobjects/sObject/id/blobField" |
-    "/services/data/vXX.X/sobjects/sObject/id/relationshipName" |
-    "/services/data/vXX.X/sobjects/sObject/updated" |
-    "/services/data/vXX.X/support/dataCategoryGroups" |
-    "/services/data/vXX.X/support/dataCategoryGroups/group/​dataCategories/​category" |
-    "/services/data/vXX.X/support/knowledgeArticles/articleId";
+    uri:
+        | string
+        | "/services/data"
+        | "/services/data/vXX.X"
+        | "/services/data/vXX.X/actions/standard"
+        | "/services/data/vXX.X/actions/custom"
+        | "/services/data/vXX.X/async-queries"
+        | "/services/data/vXX.X/chatter"
+        | "/services/data/vXX.X/commerce"
+        | "/services/data/vXX.X/composite"
+        | "/services/data/vXX.X/composite/batch"
+        | "/services/data/vXX.X/composite/tree"
+        | "/services/data/vXX.X/composite/sobjects"
+        | "/services/data/vXX.X/limits"
+        | "/services/data/vXX.X/metadata"
+        | "/services/data/vXX.X/parameterizedSearch"
+        | "/services/data/vXX.X/query"
+        | "/services/data/vXX.X/queryAll"
+        | "/services/data/vXX.X/recent"
+        | "/services/data/vXX.X/search"
+        | "/services/data/vXX.X/sobjects"
+        | "/services/data/vXX.X/sobjects/eventName/eventSchema"
+        | "/services/data/vXX.X/sobjects/relevantItems"
+        | "/services/data/vXX.X/sobjects/sObject"
+        | "/services/data/vXX.X/sobjects/sObject/deleted"
+        | "/services/data/vXX.X/sobjects/sObject/describe"
+        | "/services/data/vXX.X/sobjects/sObject/fieldName/fieldValue"
+        | "/services/data/vXX.X/sobjects/sObject/id"
+        | "/services/data/vXX.X/sobjects/sObject/id/blobField"
+        | "/services/data/vXX.X/sobjects/sObject/id/relationshipName"
+        | "/services/data/vXX.X/sobjects/sObject/updated"
+        | "/services/data/vXX.X/support/dataCategoryGroups"
+        | "/services/data/vXX.X/support/dataCategoryGroups/group/​dataCategories/​category"
+        | "/services/data/vXX.X/support/knowledgeArticles/articleId";
 
     /**
      * @description The query string parameters to send on the request.
@@ -101,7 +102,8 @@ export default class SendSalesforceRequest implements IActivityHandler {
     async execute(
         inputs: SendSalesforceRequestInputs
     ): Promise<SendSalesforceRequestOutputs> {
-        const { body, headers, method, uri, query, service, expectedResponse } = inputs;
+        const { body, headers, method, uri, query, service, expectedResponse } =
+            inputs;
         if (!service) {
             throw new Error("service is required");
         }
@@ -117,7 +119,13 @@ export default class SendSalesforceRequest implements IActivityHandler {
         path = "/" + path.replace(/^\/|\/$/g, "");
 
         if (method == "GET") {
-            const response = await get(service, path, query, headers, expectedResponse);
+            const response = await get(
+                service,
+                path,
+                query,
+                headers,
+                expectedResponse
+            );
             return {
                 result: response,
             };
@@ -132,12 +140,7 @@ export default class SendSalesforceRequest implements IActivityHandler {
                 result: response,
             };
         } else if (method == "DELETE") {
-            const response = await httpDelete(
-                service,
-                path,
-                body,
-                headers
-            );
+            const response = await httpDelete(service, path, body, headers);
             return {
                 result: response,
             };

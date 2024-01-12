@@ -32,12 +32,9 @@ interface CreateSalesforceServiceInputs {
      */
     redirectUri: string;
 
-
     /** @description The redirect page timeout in milliseconds (optional).
      */
     timeout?: number;
-
-
 }
 
 interface CreateSalesforceServiceOutputs {
@@ -55,7 +52,9 @@ interface CreateSalesforceServiceOutputs {
  * @supportedApps EXB, GWV, WAB
  */
 export default class CreateSalesforceService implements IActivityHandler {
-    async execute(inputs: CreateSalesforceServiceInputs): Promise<CreateSalesforceServiceOutputs> {
+    async execute(
+        inputs: CreateSalesforceServiceInputs
+    ): Promise<CreateSalesforceServiceOutputs> {
         const { url, version, clientId, redirectUri, timeout } = inputs;
 
         if (!version) {
@@ -75,7 +74,9 @@ export default class CreateSalesforceService implements IActivityHandler {
         const authorizationUri = `${salesforceUri}/services/oauth2/authorize`;
         const tokenUri = `${salesforceUri}/services/oauth2/token`;
 
-        const formattedVersion = `${version}${Number.isInteger(version) ? ".0" : ""}`;
+        const formattedVersion = `${version}${
+            Number.isInteger(version) ? ".0" : ""
+        }`;
 
         // Assemble OAuth URL
         const authorizeUrl = new URL(authorizationUri);
@@ -85,13 +86,12 @@ export default class CreateSalesforceService implements IActivityHandler {
         authorizeUrl.searchParams.append("state", generateRandomState());
 
         const code = await authenticate(authorizeUrl, redirectUri, timeout);
-        const token = await getToken(tokenUri,
-            {
-                code,
-                grant_type: "authorization_code",
-                redirect_uri: redirectUri,
-                client_id: clientId
-            });
+        const token = await getToken(tokenUri, {
+            code,
+            grant_type: "authorization_code",
+            redirect_uri: redirectUri,
+            client_id: clientId,
+        });
         if (token) {
             return {
                 service: {
@@ -100,16 +100,19 @@ export default class CreateSalesforceService implements IActivityHandler {
                     version: formattedVersion,
                     clientId: clientId,
                     redirectUri: redirectUri,
-                }
-            }
+                },
+            };
         }
 
         throw new Error(`Authentication failed when trying to access: ${url}`);
     }
 }
 
-async function authenticate(uri: URL, redirectUri: string, timeout?: number): Promise<string> {
-
+async function authenticate(
+    uri: URL,
+    redirectUri: string,
+    timeout?: number
+): Promise<string> {
     // Compute window dimensions and position
     const windowArea = {
         width: Math.floor(window.outerWidth * 0.8),
@@ -117,8 +120,12 @@ async function authenticate(uri: URL, redirectUri: string, timeout?: number): Pr
         left: 0,
         top: 0,
     };
-    windowArea.left = Math.floor(window.screenX + ((window.outerWidth - windowArea.width) / 2));
-    windowArea.top = Math.floor(window.screenY + ((window.outerHeight - windowArea.height) / 2));
+    windowArea.left = Math.floor(
+        window.screenX + (window.outerWidth - windowArea.width) / 2
+    );
+    windowArea.top = Math.floor(
+        window.screenY + (window.outerHeight - windowArea.height) / 2
+    );
     const windowOpts = `toolbar=0,scrollbars=1,status=1,resizable=1,location=1,menuBar=0,width=${windowArea.width},height=${windowArea.height},left=${windowArea.left},top=${windowArea.top}`;
 
     const authWindow = window.open(uri, "oauth-popup", windowOpts);
@@ -134,7 +141,11 @@ async function authenticate(uri: URL, redirectUri: string, timeout?: number): Pr
             window.clearInterval(checkClosedHandle);
             window.clearTimeout(timeoutHandle);
             // Ensure the message origin matches the expected redirect URI
-            if (e.data && typeof e.data === "string" && redirectUri.startsWith(e.origin)) {
+            if (
+                e.data &&
+                typeof e.data === "string" &&
+                redirectUri.startsWith(e.origin)
+            ) {
                 const parsedUrl = new URL(e.data);
                 const code = parsedUrl.searchParams.get("code");
                 const error = parsedUrl.searchParams.get("error");
@@ -142,7 +153,8 @@ async function authenticate(uri: URL, redirectUri: string, timeout?: number): Pr
                 window.removeEventListener("message", onMessage);
                 if (error) {
                     reject(error);
-                } if (code) {
+                }
+                if (code) {
                     resolve(code);
                 } else {
                     reject("OAuth callback did not provide code");
@@ -162,12 +174,8 @@ async function authenticate(uri: URL, redirectUri: string, timeout?: number): Pr
             }
             return reject("timeout");
         }, timeout || 60000);
-
     });
-
 }
-
-
 
 function generateRandomState(): string {
     const array = new Uint32Array(10);
@@ -177,7 +185,7 @@ function generateRandomState(): string {
 
 async function getToken<T = SalesforceToken>(
     url: string,
-    body?: Record<string, string>,
+    body?: Record<string, string>
 ): Promise<T> {
     const response = await fetch(url, {
         method: "POST",

@@ -14,7 +14,15 @@ export function get<T = any>(
     headers?: Record<string, any>,
     expectedResponse?: "blob" | "json"
 ): Promise<T> {
-    return httpRequest(service, "GET", path, query, undefined, headers, expectedResponse);
+    return httpRequest(
+        service,
+        "GET",
+        path,
+        query,
+        undefined,
+        headers,
+        expectedResponse
+    );
 }
 
 export function post<T = any>(
@@ -52,7 +60,7 @@ async function httpRequest<T = any>(
     body?: Record<string, any>,
     headers?: Record<string, any>,
     expectedResponse?: "blob" | "json",
-    allowTokenRefresh?: boolean,
+    allowTokenRefresh?: boolean
 ): Promise<T> {
     if (!service.instanceUrl) {
         throw new Error("url is required");
@@ -83,7 +91,16 @@ async function httpRequest<T = any>(
     if (error) {
         if (error.statusCode === 401 && allowTokenRefresh !== false) {
             if (await tryRefreshToken(service)) {
-                return httpRequest(service, method, path, query, body, headers, expectedResponse, false);
+                return httpRequest(
+                    service,
+                    method,
+                    path,
+                    query,
+                    body,
+                    headers,
+                    expectedResponse,
+                    false
+                );
             }
         }
         throw error;
@@ -109,7 +126,7 @@ async function tryRefreshToken(service: SalesforceService): Promise<boolean> {
     } catch {
         // Swallow errors
     }
-    return false
+    return false;
 }
 
 export async function getResponseError(response: Response) {
@@ -129,14 +146,16 @@ export async function getResponseError(response: Response) {
     }
 }
 
-async function refreshToken(service: SalesforceService): Promise<SalesforceToken | undefined> {
+async function refreshToken(
+    service: SalesforceService
+): Promise<SalesforceToken | undefined> {
     const refreshUri = `${service.instanceUrl}/services/oauth2/token`;
     const body = {
         refresh_token: service.token.refresh_token,
         grant_type: "refresh_token",
         client_id: service.clientId,
         redirect_uri: service.redirectUri,
-    }
+    };
     const response = await fetch(refreshUri, {
         method: "POST",
         headers: {
