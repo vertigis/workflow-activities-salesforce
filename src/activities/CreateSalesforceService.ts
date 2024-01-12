@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import type { IActivityHandler } from "@vertigis/workflow";
 import { SalesforceService, SalesforceToken } from "../SalesforceService";
-import { checkResponse } from "../request";
+import { SalesforceRequestError } from "../SalesforceRequestError";
 
 /** An interface that defines the inputs of the activity. */
 interface CreateSalesforceServiceInputs {
@@ -80,46 +80,37 @@ export default class CreateSalesforceService implements IActivityHandler {
         const formattedVersion = `${version}${Number.isInteger(version) ? ".0" : ""}`;
 
         // Assemble OAuth URL
-        const qs = objectToQueryString({
-            client_id: clientId,
-            redirect_uri: redirectUri,
-            response_type: "code",
-            state: generateRandomState(),
+        const authorizeUrl = new URL(authorizationUri);
+        authorizeUrl.searchParams.append("client_id", clientId);
+        authorizeUrl.searchParams.append("redirect_uri", redirectUri);
+        authorizeUrl.searchParams.append("response_type", "code");
+        authorizeUrl.searchParams.append("state", generateRandomState());
 
-
-        })
-        const authorizeUrl = `${authorizationUri}?${qs}`
         const code = await authenticate(authorizeUrl, redirectUri, timeout);
-
-        if (code) {
-            const token = await getToken(tokenUri,
-                {
-                    code: code,
-                    grant_type: "authorization_code",
-                    redirect_uri: redirectUri,
-                    client_id: clientId
-                });
-            if (token) {
-                return {
-                    service: {
-                        token: token,
-                        instanceUrl: url,
-                        version: formattedVersion,
-                        clientId: clientId,
-                        redirectUri: redirectUri,
-                    }
+        const token = await getToken(tokenUri,
+            {
+                code,
+                grant_type: "authorization_code",
+                redirect_uri: redirectUri,
+                client_id: clientId
+            });
+        if (token) {
+            return {
+                service: {
+                    token: token,
+                    instanceUrl: url,
+                    version: formattedVersion,
+                    clientId: clientId,
+                    redirectUri: redirectUri,
                 }
             }
-
-
         }
 
-        throw new Error(`Authentication failed when trying to access: ${url}` );
-
+        throw new Error(`Authentication failed when trying to access: ${url}`);
     }
 }
 
-async function authenticate(uri: string, redirectUri: string, timeout?: number): Promise<any> {
+async function authenticate(uri: URL, redirectUri: string, timeout?: number): Promise<string> {
 
     // Compute window dimensions and position
     const windowArea = {
@@ -144,7 +135,7 @@ async function authenticate(uri: string, redirectUri: string, timeout?: number):
         const onMessage = (e: MessageEvent<any>) => {
             window.clearInterval(checkClosedHandle);
             window.clearTimeout(timeoutHandle);
-            // Compare current script origin to the origin and source of the post message
+            // Ensure the message origin matches the expected redirect URI
             if (e.data && typeof e.data === "string" && redirectUri.startsWith(e.origin)) {
                 const parsedUrl = new URL(e.data);
                 const code = parsedUrl.searchParams.get("code");
@@ -153,12 +144,12 @@ async function authenticate(uri: string, redirectUri: string, timeout?: number):
                 window.removeEventListener("message", onMessage);
                 if (error) {
                     reject(error);
-                } else {
+                } if (code) {
                     resolve(code);
+                } else {
+                    reject("OAuth callback did not provide code");
                 }
             }
-
-
         };
         window.addEventListener("message", onMessage, { once: false });
 
@@ -186,46 +177,20 @@ function generateRandomState(): string {
     return array.join("");
 }
 
-function objectToQueryString(
-    data?: Record<string, string | number | boolean | null | undefined>
-): string {
-    if (!data) {
-        return "";
-    }
-    return Object.keys(data)
-        .map((k) => {
-            const value = data[k];
-            const valueToEncode =
-                value === undefined || value === null ? "" : value;
-            return `${encodeURIComponent(k)}=${encodeURIComponent(
-                valueToEncode
-            )}`;
-        })
-        .join("&");
-}
-
 async function getToken<T = SalesforceToken>(
     url: string,
-    body?: Record<string, any>,
-    headers?: Record<string, any>
+    body?: Record<string, string>,
 ): Promise<T> {
     const response = await fetch(url, {
         method: "POST",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
-            ...headers,
         },
-        body: objectToQueryString(body),
+        body: new URLSearchParams(body),
     });
 
-    await checkResponse(response);
-
-    if (
-        response.status === 204 ||
-        response.headers.get("content-length") === "0"
-    ) {
-        // No content
-        return {} as T;
+    if (!response.ok) {
+        throw new SalesforceRequestError(response.status);
     }
 
     return await response.json();

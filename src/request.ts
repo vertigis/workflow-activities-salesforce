@@ -1,54 +1,58 @@
 import { SalesforceService, SalesforceToken } from "./SalesforceService";
 import { SalesforceRequestError } from "./SalesforceRequestError";
 
-const MAX_ATTEMPTS = 2;
-
 function getAuthHeaders(salesforceService: SalesforceService) {
     return {
         Authorization: `Bearer ${salesforceService.token.access_token}`,
     };
 }
 
-export async function get<T = any>(
+export function get<T = any>(
     service: SalesforceService,
     path: string,
     query?: Record<string, string | number | boolean | null | undefined>,
     headers?: Record<string, any>,
     expectedResponse?: "blob" | "json"
 ): Promise<T> {
-    if (!service.instanceUrl) {
-        throw new Error("instanceUrl is required");
-    }
-    if (!service.token) {
-        throw new Error("accessToken is required");
-    }
-    const qs = objectToQueryString({ ...query });
-    const url = `${service.instanceUrl}${path}${qs ? "?" + qs : ""}`;
-    for (let i = 0; i < MAX_ATTEMPTS; i++) {
-        const response = await fetch(url, {
-            headers: {
-                Accept: expectedResponse === "blob" ? "*/*" : "application/json",
-                ...getAuthHeaders(service),
-                ...headers,
-            },
-        });
-
-        if (await checkResponse(response, service)) {
-            if (expectedResponse === "blob") {
-                return await response.blob() as T;
-            } else {
-                return await response.json();
-            }
-        }
-    }
-    throw new Error(`Unable to complete Salesforce GET request to: ${url}`);
+    return httpRequest(service, "GET", path, query, undefined, headers, expectedResponse);
 }
 
-export async function post<T = any>(
+export function post<T = any>(
     service: SalesforceService,
     path: string,
     body?: Record<string, any>,
     headers?: Record<string, any>
+): Promise<T> {
+    return httpRequest(service, "POST", path, undefined, body, headers);
+}
+
+export function patch<T = any>(
+    service: SalesforceService,
+    path: string,
+    body?: Record<string, any>,
+    headers?: Record<string, any>
+): Promise<T> {
+    return httpRequest(service, "PATCH", path, undefined, body, headers);
+}
+
+export function httpDelete<T = any>(
+    service: SalesforceService,
+    path: string,
+    body?: Record<string, any>,
+    headers?: Record<string, any>
+): Promise<T> {
+    return httpRequest(service, "DELETE", path, undefined, body, headers);
+}
+
+async function httpRequest<T = any>(
+    service: SalesforceService,
+    method: "GET" | "POST" | "PATCH" | "DELETE",
+    path: string,
+    query?: Record<string, string | number | boolean | null | undefined>,
+    body?: Record<string, any>,
+    headers?: Record<string, any>,
+    expectedResponse?: "blob" | "json",
+    allowTokenRefresh?: boolean,
 ): Promise<T> {
     if (!service.instanceUrl) {
         throw new Error("url is required");
@@ -56,110 +60,59 @@ export async function post<T = any>(
     if (!service.token) {
         throw new Error("accessToken is required");
     }
-    const url = `${service.instanceUrl}${path}`;
-    for (let i = 0; i < MAX_ATTEMPTS; i++) {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                ...getAuthHeaders(service),
-                ...headers,
-            },
-            body: JSON.stringify(body),
-        });
 
-        if (await checkResponse(response, service)) {
-            return await response.json();
+    const url = new URL(`${service.instanceUrl}${path}`);
+
+    if (query) {
+        for (const [key, value] of Object.entries(query)) {
+            url.searchParams.append(key, value?.toString() || "");
         }
     }
-    throw new Error(`Unable to complete Salesforce POST request to: ${url}`);
-}
 
-export async function patch<T = any>(
-    service: SalesforceService,
-    path: string,
-    body?: Record<string, any>,
-    headers?: Record<string, any>
-): Promise<T> {
-    if (!service.instanceUrl) {
-        throw new Error("url is required");
-    }
-    if (!service.token) {
-        throw new Error("accessToken is required");
-    }
-    const url = `${service.instanceUrl}${path}`;
-    for (let i = 0; i < MAX_ATTEMPTS; i++) {
-        const response = await fetch(url, {
-            method: "PATCH",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                ...getAuthHeaders(service),
-                ...headers,
-            },
-            body: JSON.stringify(body),
-        });
+    const response = await fetch(url, {
+        method,
+        headers: {
+            Accept: expectedResponse === "blob" ? "*/*" : "application/json",
+            ...getAuthHeaders(service),
+            ...headers,
+        },
+        body: body ? JSON.stringify(body) : undefined,
+    });
 
-        if (await checkResponse(response, service)) {
-            if (
-                response.status === 204 ||
-                response.headers.get("content-length") === "0"
-            ) {
-                // No content
-                return {} as T;
-            } else {
-                return await response.json();
+    const error = await getResponseError(response);
+    if (error) {
+        if (error.statusCode === 401 && allowTokenRefresh !== false) {
+            if (await tryRefreshToken(service)) {
+                return httpRequest(service, method, path, query, body, headers, expectedResponse, false);
             }
         }
+        throw error;
     }
-    throw new Error(`Unable to complete Salesforce PATCH request to: ${url}`);
+
+    if (response && response.status === 204) {
+        // No content
+        return {} as T;
+    } else {
+        return await response.json();
+    }
 }
 
-export async function httpDelete(
-    service: SalesforceService,
-    path: string,
-    body?: Record<string, any>,
-    headers?: Record<string, any>
-): Promise<void> {
-    if (!service.instanceUrl) {
-        throw new Error("url is required");
-    }
-    if (!service.token) {
-        throw new Error("accessToken is required");
-    }
-    const url = `${service.instanceUrl}${path}`;
-    for (let i = 0; i < MAX_ATTEMPTS; i++) {
-        const response = await fetch(url, {
-            method: "DELETE",
-            headers: {
-                Accept: "application/json",
-                ...getAuthHeaders(service),
-                ...headers,
-            },
-            body: JSON.stringify(body),
-        });
-        if(await checkResponse(response)) {
-            return;
+async function tryRefreshToken(service: SalesforceService): Promise<boolean> {
+    try {
+        if (service.token.refresh_token) {
+            const token = await refreshToken(service);
+            if (token) {
+                service.token = token;
+                return true;
+            }
         }
-
+    } catch {
+        // Swallow errors
     }
-
-    throw new Error(`Unable to complete Salesforce DELETE request to: ${url}`);
+    return false
 }
 
-export async function checkResponse(
-    response: Response,
-    service?: SalesforceService,
-    message?: string,
-): Promise<boolean> {
-    if (response.status === 401 && service) {
-        const token = await refreshToken(service);
-        if (token) {
-            service.token = token;
-            return false;
-        }
-    }
+export async function getResponseError(response: Response) {
     if (!response.ok) {
         // Try to read the error body of the response
         let errors: Record<string, any>[] | undefined;
@@ -172,27 +125,8 @@ export async function checkResponse(
                 // Swallow errors reading the response so that we don't mask the original failure
             }
         }
-        throw new SalesforceRequestError(response.status, errors, message);
+        return new SalesforceRequestError(response.status, errors);
     }
-    return true;
-}
-
-function objectToQueryString(
-    data?: Record<string, string | number | boolean | null | undefined>
-): string {
-    if (!data) {
-        return "";
-    }
-    return Object.keys(data)
-        .map((k) => {
-            const value = data[k];
-            const valueToEncode =
-                value === undefined || value === null ? "" : value;
-            return `${encodeURIComponent(k)}=${encodeURIComponent(
-                valueToEncode
-            )}`;
-        })
-        .join("&");
 }
 
 async function refreshToken(service: SalesforceService): Promise<SalesforceToken | undefined> {
@@ -208,7 +142,7 @@ async function refreshToken(service: SalesforceService): Promise<SalesforceToken
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: objectToQueryString(body),
+        body: new URLSearchParams(body),
     });
 
     if (
