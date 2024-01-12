@@ -56,7 +56,8 @@ export default class CreateSalesforceObject implements IActivityHandler {
             throw new Error("sObject is required");
         }               
         const encodedSObject = encodeURIComponent(sObject);
-        const path = `/services/data/v${salesforceService.version}/sobjects/${encodedSObject}`;
+        
+        const path = `services/data/v${salesforceService.version}/sobjects/${encodedSObject}`;
         const response = await post(salesforceService, path, salesforceObject);
         return {
             result: response,

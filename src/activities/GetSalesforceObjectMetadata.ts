@@ -47,7 +47,7 @@ export default class GetSalesforceObjectMetadata implements IActivityHandler {
             throw new Error("sObject is required");
         }
         const encodedSObject = encodeURIComponent(sObject);
-        const path = `/services/data/v${salesforceService.version}/sobjects/${encodedSObject}`;
+        const path = `services/data/v${salesforceService.version}/sobjects/${encodedSObject}`;
         const response = await get(salesforceService, path);
         return {
             result: response,

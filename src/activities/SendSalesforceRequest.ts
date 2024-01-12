@@ -82,7 +82,10 @@ export default class SendSalesforceRequest implements IActivityHandler {
             throw new Error("uri is required");
         }
 
-        const path = uri.replace(/\/v\d+.\d\//, `/v${service.version}/`);
+        //force the current version
+        let path = uri.replace(/\/v\d+\.\d+\//, `/v${service.version}/`);
+        //remove leading and trailing slashes
+        path = path.replace(/^\/|\/$/g, "");
 
         if (method == "GET") {
             const response = await get(service, path, query, headers, expectedResponse);

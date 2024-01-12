@@ -39,7 +39,6 @@ export async function get<T = any>(
             } else {
                 return await response.json();
             }
-            break;
         }
     }
     throw new Error(`Unable to complete Salesforce GET request to: ${url}`);
@@ -71,17 +70,7 @@ export async function post<T = any>(
         });
 
         if (await checkResponse(response, service)) {
-            if (
-                response.status === 204 ||
-                response.headers.get("content-length") === "0"
-            ) {
-                // No content
-                return {} as T;
-            } else {
-                return await response.json();
-            }
-            break;
-
+            return await response.json();
         }
     }
     throw new Error(`Unable to complete Salesforce POST request to: ${url}`);
@@ -127,12 +116,12 @@ export async function patch<T = any>(
     throw new Error(`Unable to complete Salesforce PATCH request to: ${url}`);
 }
 
-export async function httpDelete<T = any>(
+export async function httpDelete(
     service: SalesforceService,
     path: string,
     body?: Record<string, any>,
     headers?: Record<string, any>
-): Promise<T> {
+): Promise<void> {
     if (!service.instanceUrl) {
         throw new Error("url is required");
     }
@@ -150,16 +139,8 @@ export async function httpDelete<T = any>(
             },
             body: JSON.stringify(body),
         });
+        await checkResponse(response);
 
-        if (await checkResponse(response)) {
-            break;
-        }
-        if (response && response.status === 204) {
-            // No content
-            return {} as T;
-        } else {
-            return await response.json();
-        }
     }
 
     throw new Error(`Unable to complete Salesforce DELETE request to: ${url}`);

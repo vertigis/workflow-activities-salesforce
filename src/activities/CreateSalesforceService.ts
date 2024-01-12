@@ -57,7 +57,7 @@ interface CreateSalesforceServiceOutputs {
  * @supportedApps EXB, GWV, WAB
  */
 export default class CreateSalesforceService implements IActivityHandler {
-    async execute(inputs: CreateSalesforceServiceInputs): Promise<CreateSalesforceServiceOutputs | undefined> {
+    async execute(inputs: CreateSalesforceServiceInputs): Promise<CreateSalesforceServiceOutputs> {
         const { url, version, clientId, redirectUri, timeout } = inputs;
 
         if (!version) {
@@ -73,11 +73,11 @@ export default class CreateSalesforceService implements IActivityHandler {
             throw new Error("redirectUri is required");
         }
 
-        const saleforceUri = url.replace(/\/*$/, "");
-        const authorizationUri = `${saleforceUri}/services/oauth2/authorize`;
-        const tokenUri = `${saleforceUri}/services/oauth2/token`;
+        const salesforceUri = url.replace(/\/*$/, "");
+        const authorizationUri = `${salesforceUri}/services/oauth2/authorize`;
+        const tokenUri = `${salesforceUri}/services/oauth2/token`;
 
-        const formattedVersion = encodeURIComponent(typeof version === "number" ?  (Math.round(version * 10) / 10).toFixed(1).toString() : version);
+        const formattedVersion = `${version}${Number.isInteger(version) ? ".0" : ""}`;
 
         // Assemble OAuth URL
         const qs = objectToQueryString({
@@ -114,7 +114,7 @@ export default class CreateSalesforceService implements IActivityHandler {
 
         }
 
-        return undefined;
+        throw new Error(`Authentication failed when trying to access: ${url}` );
 
     }
 }
@@ -142,33 +142,13 @@ async function authenticate(uri: string, redirectUri: string, timeout?: number):
             }
         }, 500);
         const onMessage = (e: MessageEvent<any>) => {
-            // Compare current script origin to the origin and source of the post message
-            // Compare the state parameter
-            console.log("message", e)
             window.clearInterval(checkClosedHandle);
             window.clearTimeout(timeoutHandle);
-            let error: string | undefined = undefined;
-            let code: string = "";
-
-            if (e.data && typeof e.data === "string" && e.data.startsWith(redirectUri)) {
-                // Copy all querystring and hash parameters to the result
+            // Compare current script origin to the origin and source of the post message
+            if (e.data && typeof e.data === "string" && redirectUri.startsWith(e.origin)) {
                 const parsedUrl = new URL(e.data);
-                for (const [key, value] of parsedUrl.searchParams.entries()) {
-                    if (key === "code") {
-                        code = value;
-                    } else if (key === "error") {
-                        error = value;
-                    }
-
-                }
-                const hashParams = new URLSearchParams(parsedUrl.hash.substring(1));
-                for (const [key, value] of hashParams.entries()) {
-                    if (key === "code") {
-                        code = value;
-                    } else if (key === "error") {
-                        error = value;
-                    }
-                }
+                const code = parsedUrl.searchParams.get("code");
+                const error = parsedUrl.searchParams.get("error");
                 window.clearInterval(checkClosedHandle);
                 window.removeEventListener("message", onMessage);
                 if (error) {
