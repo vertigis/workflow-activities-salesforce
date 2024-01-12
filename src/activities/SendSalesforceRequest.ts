@@ -84,8 +84,7 @@ export default class SendSalesforceRequest implements IActivityHandler {
 
         //force the current version
         let path = uri.replace(/\/v\d+\.\d+\//, `/v${service.version}/`);
-        //remove leading and trailing slashes
-        path = path.replace(/^\/|\/$/g, "");
+        path = "/" + path.replace(/^\/|\/$/g, "");
 
         if (method == "GET") {
             const response = await get(service, path, query, headers, expectedResponse);

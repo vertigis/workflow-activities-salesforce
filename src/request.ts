@@ -23,7 +23,7 @@ export async function get<T = any>(
         throw new Error("accessToken is required");
     }
     const qs = objectToQueryString({ ...query });
-    const url = `${service.instanceUrl}/${path}${qs ? "?" + qs : ""}`;
+    const url = `${service.instanceUrl}${path}${qs ? "?" + qs : ""}`;
     for (let i = 0; i < MAX_ATTEMPTS; i++) {
         const response = await fetch(url, {
             headers: {
@@ -139,8 +139,8 @@ export async function httpDelete(
             },
             body: JSON.stringify(body),
         });
-        if(!await checkResponse(response)) {
-            continue;
+        if(await checkResponse(response)) {
+            return;
         }
 
     }
