@@ -31,7 +31,11 @@ export function post<T = any>(
     body?: Record<string, any>,
     headers?: Record<string, any>,
 ): Promise<T> {
-    return httpRequest(service, "POST", path, undefined, body, headers);
+    const postHeaders = {
+        ...headers,
+        ["Content-Type"]: "application/json"
+    };
+    return httpRequest(service, "POST", path, undefined, body, postHeaders);
 }
 
 export function patch<T = any>(
@@ -40,7 +44,11 @@ export function patch<T = any>(
     body?: Record<string, any>,
     headers?: Record<string, any>,
 ): Promise<T> {
-    return httpRequest(service, "PATCH", path, undefined, body, headers);
+    const patchHeaders = {
+        ...headers,
+        ["Content-Type"]: "application/json"
+    };
+    return httpRequest(service, "PATCH", path, undefined, body, patchHeaders);
 }
 
 export function httpDelete<T = any>(
