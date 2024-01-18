@@ -80,6 +80,7 @@ async function httpRequest<T = any>(
     const response = await fetch(url, {
         method,
         headers: {
+            "Content-Type": method === "POST" || method === "PATCH" ? "application/json" : "*/*",
             Accept: expectedResponse === "blob" ? "*/*" : "application/json",
             ...getAuthHeaders(service),
             ...headers,
